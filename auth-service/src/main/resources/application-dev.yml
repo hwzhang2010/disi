@@ -1,0 +1,107 @@
+ ## 日志配置
+logging:
+  level:
+    root: info
+    com.hywx.gw.authserver: debug
+
+spring:
+  application:
+    name: auth-service
+  cloud:
+    consul:
+      host: localhost #consul 注册中心地址
+      port: 8500
+      discovery:
+        register: true
+        failFast: true
+        enabled: true
+        register-health-check: true
+        hostname: localhost  #本机地址
+        serviceName: ${spring.application.name}
+        instanceId: auth-service_mp
+        tags: service,auth-service
+        healthCheckPath: /actuator/health
+        health-check-interval: 10s
+  datasource:
+    dynamic:
+      hikari:
+        connection-timeout: 30000
+        max-lifetime: 1800000
+        max-pool-size: 15
+        min-idle: 5
+        connection-test-query: select 1
+        pool-name: FebsHikariCP
+      primary: base
+      datasource:
+        base:
+          username: gw
+          password: Gw1234@1234
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://10.81.22.184:3306/gw_generalmanage?autoReconnect=true&useSSL=false&serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF-8
+
+  redis:
+    database: 0
+    host: 10.81.22.190
+    port: 6379
+    lettuce:
+      pool:
+        min-idle: 8
+        max-idle: 500
+        max-active: 2000
+        max-wait: 10000
+    timeout: 5000
+  thymeleaf:
+    cache: false
+
+  #端口配置
+server:
+  port: 8091
+#  servlet:
+#    context-path: /auth-service/v1
+mybatis-plus:
+  type-aliases-package: com.hywx.authservice.dao
+  mapper-locations: classpath:mybatis/*.xml
+  configuration:
+    jdbc-type-for-null: null
+  global-config:
+    banner: false
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,info,health
+
+#第三方登录
+#justauth:
+#  enabled: true
+#  type:
+#    github:
+#      client-id: c5dd4a0b003807c6caa7
+#      client-secret: a5b180d5f57cc642548a4a8bd7fbbaf53cae02df
+#      redirect-uri: http://gwcloud.hywx.cc:8092/auth/social/github/callback
+
+hywx:
+  cloud:
+    security:
+      # 配置免认证的url
+      anon-uris: /sso/**,/oauth/token,/user/authorize,/user/token,/captcha,/actuator/**,/social/**,/result.html,/error.html,/csrf,/login,/js/**,/img/**,/css/**,/templates/**,/swagger-ui.html,/webjars/**,/swagger-resources/**,/v2/api-docs/**,/
+      # 配置是否通过网关访问
+      onlyFetchByGateway: false
+
+#swagger 配置
+swagger:
+  doc:
+    enable: true
+    basePackage: com.hywx.authservice.controller
+    title: ${spring.application.name}文档
+    description: ${swagger.doc.title}
+    version: 1.0
+    author: tang
+    url: http://locahost:8091
+    email: 773796932@qq.com
+    grantUrl: http://localhost:8092/auth/oauth/token
+    name: gw_auth_swagger
+    scope: test
+

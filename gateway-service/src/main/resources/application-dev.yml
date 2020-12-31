@@ -1,0 +1,70 @@
+ ## 日志配置
+logging:
+  level:
+    root: info
+    com.hywx.gw.gatewayservice: debug
+
+#端口配置
+server:
+  port: 8098
+
+
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    consul:
+      host: localhost #consul 注册中心地址
+      port: 8500
+      discovery:
+        register: true
+        failFast: true
+        enabled: true
+        register-health-check: true
+        hostname: localhost  #本机地址
+        serviceName: ${spring.application.name}
+        instanceId: gateway-service_mp
+        tags: service,gateway-service
+        healthCheckPath: /actuator/health
+        health-check-interval: 10s
+  gateway:
+    routes:
+      - id: auth-service
+        uri: lb://auth-service # lb为load balance的缩写，微服务名称为注册中心中对应的微服务名
+        predicates:
+          - Path=/auth/**  #/auth开头的都会被匹配
+        filters:
+          - name: Hystrix
+            args:
+              name: authfallback
+              fallbackUri: forward:/fallback/auth-service
+#            - StripPrefix=1 # StripPrefix=1的意思是，请求转发前，将Path的内容截去前面一位。比如/auth/hello会被截取为/hello
+      - id: user-service
+        uri: lb://user-service
+        predicates:
+          - Path=/user/**
+        filters:
+          - name: Hystrix
+            args:
+              name: userfallback
+              fallbackUri: forward:/fallback/user-service
+#            - StripPrefix=1
+    default-filters:
+      - StripPrefix=1
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 10000
+swagger:
+  doc:
+    gateway:
+      resources: user-service
+
+
+
+
+

@@ -1,0 +1,92 @@
+ ## 日志配置
+logging:
+  level:
+    root: info
+    com.hywx.gw.userservice: debug
+
+spring:
+  application:
+    name: zuul-service
+  cloud:
+    consul:
+      host: localhost #consul 注册中心地址
+      port: 8500
+      discovery:
+        register: true
+        failFast: true
+        enabled: true
+        register-health-check: true
+        hostname: localhost  #本机地址
+        serviceName: ${spring.application.name}
+        instanceId: zuul-service_mp
+        tags: service,zuul-service
+        healthCheckPath: /actuator/health
+        health-check-interval: 10s
+  datasource:
+    dynamic:
+      hikari:
+        connection-timeout: 30000
+        max-lifetime: 1800000
+        max-pool-size: 15
+        min-idle: 5
+        connection-test-query: select 1
+        pool-name: FebsHikariCP
+      primary: base
+      datasource:
+        base:
+          username: gw
+          password: Gw1234@1234
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://10.81.22.184:3306/gw_generalmanage?autoReconnect=true&useSSL=false&serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF-8
+
+
+#端口配置
+zuul:
+  routes:
+    auth:
+      path: /auth/**
+      serviceId: auth-service
+      sensitiveHeaders: "*"
+    system:
+      path: /system/**
+      serviceId: user-service
+      sensitiveHeaders: "*"
+    lpse:
+      path: /lpse/**
+      serviceId: lpse-service
+      sensitiveHeaders: "*"
+  retryable: true  #开启重试机制
+  ignored-services: "*"
+  ribbon:
+    eager-load:
+      enabled: true
+  SendErrorFilter:
+      error:
+        disable: true
+
+ribbon:
+  ReadTimeout: 100000
+
+server:
+  port: 8092
+#  servlet:
+#    context-path: /auth-server/v1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,info,health
+
+#网关集成swagger
+swagger:
+  doc:
+    resources: user-service,auth-service,lpse-service
+cas:
+  server-login-url: http://localhost:8080/cas/login
+  server-url-prefix: http://localhost:8080/cas
+  client-host-url: http://localhost:8092/callback
+  ignore-pattern: /test
+
+
+

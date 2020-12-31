@@ -1,0 +1,30 @@
+1. auth-service 认证中心
+
+2. common 通用类
+common-core 通用工具类
+common-generator-code 代码生成类
+common-security 安全权限类
+common-swagger swagger文件配置类
+
+使用时也可以采用本地包maven 引用
+
+例：
+cd 到jar包目录
+cd  E:\code\svn\service-bak\sat-cloud\common\common-core\target
+
+mvn install:install-file -Dfile=common-core-1.0-SNAPSHOT.jar -DgroupId=com.hywx -DartifactId=common-core -Dversion=1.0-SNAPSHOT -Dpackaging=jar
+
+ <!-- 本地maven仓库引用共通包-->
+        <dependency>
+            <groupId>com.hywx</groupId>
+            <artifactId>common-core</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+
+
+3.sat-cloud 父类 管理版本 
+
+4.sat-service 服务资源类
+
+5.zuul-service 网关类

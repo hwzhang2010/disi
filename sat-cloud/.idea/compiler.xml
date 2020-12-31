@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="common-security-starter" />
+        <module name="common-core" />
+        <module name="common-swagger-starter" />
+        <module name="auth-service" />
+        <module name="common-cas-starter" />
+        <module name="user-service" />
+        <module name="lpse" />
+        <module name="zuul-service" />
+        <module name="common-generator-code" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="auth-service" target="1.8" />
+      <module name="common" target="1.8" />
+      <module name="common-cas-starter" target="1.8" />
+      <module name="common-core" target="1.8" />
+      <module name="common-generator-code" target="1.8" />
+      <module name="common-security-starter" target="1.8" />
+      <module name="common-swagger-starter" target="1.8" />
+      <module name="lpse" target="1.8" />
+      <module name="sat-cloud" target="1.8" />
+      <module name="sat-service" target="1.8" />
+      <module name="user-service" target="1.8" />
+      <module name="zuul-service" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="auth-service" options="-parameters" />
+      <module name="common-cas-starter" options="-parameters" />
+      <module name="common-core" options="-parameters" />
+      <module name="common-generator-code" options="-parameters" />
+      <module name="common-security-starter" options="-parameters" />
+      <module name="common-swagger-starter" options="-parameters" />
+      <module name="lpse" options="-parameters" />
+      <module name="user-service" options="-parameters" />
+      <module name="zuul-service" options="-parameters" />
+    </option>
+  </component>
+</project>

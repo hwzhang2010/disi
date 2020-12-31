@@ -1,0 +1,158 @@
+ ## 日志配置
+logging:
+  level:
+    root: info
+    com.hywx.userservice: debug
+
+spring:
+  application:
+    name: user-service
+  cloud:
+    consul:
+      host: localhost #consul 注册中心地址
+      port: 8500
+      discovery:
+        register: true
+        failFast: true
+        enabled: true
+        register-health-check: true
+        hostname: localhost  #本机地址
+        serviceName: ${spring.application.name}
+        instanceId: user-service_mp
+        tags: service,user-service
+        healthCheckPath: /actuator/health
+#        healthCheckPath: /user-service/v1/actuator/health
+        health-check-interval: 10s
+  datasource:
+    dynamic:
+      hikari:
+        connection-timeout: 30000
+        max-lifetime: 1800000
+        max-pool-size: 15
+        min-idle: 5
+        connection-test-query: select 1
+        pool-name: FebsHikariCP
+      primary: base
+      datasource:
+        base:
+          username: gw
+          password: Gw1234@1234
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://10.81.22.184:3306/gw_generalmanage?autoReconnect=true&useSSL=false&serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF-8
+#  zipkin:
+#    base-url: http://localhost:9411
+#  sleuth:
+#    sampler:
+#      probability: 1
+#  zipkin:
+#    sender:
+#      type: rabbit
+#  sleuth:
+#    sampler:
+#      probability: 1 #抽样率
+#  rabbitmq:
+#    host: localhost
+#    port: 5672
+#    username: hywx
+#    password: 123456
+hystrix:
+  shareSecurityContext: true
+  command:
+    default:  #default全局有效，service id指定应用有效
+      execution:
+        timeout:
+          #如果enabled设置为false，则请求超时交给ribbon控制,为true,则超时作为熔断根据
+          enabled: true
+        isolation:
+          thread:
+            timeoutInMilliseconds: 30000 #断路器超时时间，默认1000ms
+
+#开启熔断器
+feign:
+  hystrix:
+    enabled: true
+ribbon:
+  ConnectTimeout: 10000
+  ReadTimeout: 30000
+
+
+  #端口配置
+server:
+  port: 8090
+#  servlet:
+#    context-path: /user-service/v1
+
+
+
+
+
+mybatis-plus:
+  type-aliases-package: com.hywx.userservice.dao
+  mapper-locations: classpath:mybatis/*.xml
+  configuration:
+    jdbc-type-for-null: null
+  global-config:
+    banner: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,info,health
+
+
+security:
+  oauth2:
+    resource:
+      id: ${spring.application.name}
+      user-info-uri: http://localhost:8092/auth/user
+
+hywx:
+  cloud:
+    security:
+      # 配置免认证的url
+      anon-uris: /actuator/**,/user/register,/swagger-ui.html,/webjars/**,/swagger-resources/**,/v2/api-docs/**,/,/csrf
+      # 配置是否通过网关访问，默认true
+      onlyFetchByGateway: true
+
+#swagger 配置
+swagger:
+  doc:
+    enable: true
+    basePackage: com.hywx.userservice.controller
+    title: ${spring.application.name}文档
+    description: ${swagger.doc.title}
+    version: 1.0
+    author: tang
+    url: http://locahost:8090
+    email: 773796932@qq.com
+    grantUrl: http://localhost:8092/auth/oauth/token
+    name: gw_user_swagger
+    scope: test
+
+#swagger:
+#  doc:
+#    enable: true
+#    basePackage: com.hywx.userservice.controller
+#    title: ${spring.application.name}文档
+#    description: ${swagger.doc.title}
+#    version: 1.0
+#    name: tang
+#    url: http://locahost:8090
+#    email: 773796932@qq.com
+
+
+
+#gw.user.swagger.basePackage=com.hywx.userservice.controller
+#gw.user.swagger.title=USER_SERVICE API
+#gw.user.swagger.description=USER_SERVICE API
+#gw.user.swagger.version=1.0
+#gw.user.swagger.author=tang
+#gw.user.swagger.url=http://locahost:8090
+#gw.user.swagger.email=773796932@qq.com
+#gw.user.swagger.license=Apache 2.0
+#gw.user.swagger.licenseUrl=https://www.apache.org/licenses/LICENSE-2.0.html
+#gw.user.swagger.grantUrl=http://localhost:8092/auth/oauth/token
+#gw.user.swagger.name=gw_user_swagger
+#gw.user.swagger.scope=test
+

@@ -1,0 +1,51 @@
+package ${package.ServiceImpl};
+
+import ${package.Entity}.${entity};
+import ${package.Mapper}.${table.mapperName};
+import ${package.Service}.${table.serviceName};
+import ${superServiceImplClassPackage};
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+import java.util.Map;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hywx.common.core.entity.QueryRequest;
+
+/**
+ * @program: user-serice
+ * @description: $!{table.comment} service 接口实现类
+ * @author ${author}
+ * @date ${date}
+ */
+@Service
+public class ${table.serviceImplName} extends ${superServiceImplClass}<${table.mapperName}, ${entity}> implements ${table.serviceName} {
+
+        @Autowired
+        private ${entity}Mapper ${table.entityPath}Mapper;
+
+        @Override
+        public IPage<${entity}> getListByPage(QueryRequest queryRequest,${entity} ${table.entityPath}){
+        QueryWrapper<${entity}> queryWrapper = new QueryWrapper<>();
+        Page<${entity}> page = new Page<>(queryRequest.getPageNo(), queryRequest.getPageSize());
+        return this.page(page, queryWrapper);
+        }
+
+
+        @Override
+        public int saveData(${entity} ${table.entityPath}){
+            return ${table.entityPath}Mapper.insert(${table.entityPath});
+        }
+
+        @Override
+        public int updateData(${entity} ${table.entityPath}){
+            return ${table.entityPath}Mapper.updateById(${table.entityPath});
+        }
+
+        @Override
+        public int batchDelete(List<String> ids){
+        return ${table.entityPath}Mapper.deleteBatchIds(ids);
+        }
+}
+

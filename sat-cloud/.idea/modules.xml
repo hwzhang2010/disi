@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../auth-service/auth-service.iml" filepath="$PROJECT_DIR$/../auth-service/auth-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../common/common.iml" filepath="$PROJECT_DIR$/../common/common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../common/common-cas-starter/common-cas-starter.iml" filepath="$PROJECT_DIR$/../common/common-cas-starter/common-cas-starter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../common/common-core/common-core.iml" filepath="$PROJECT_DIR$/../common/common-core/common-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../common/common-generator-code/common-generator-code.iml" filepath="$PROJECT_DIR$/../common/common-generator-code/common-generator-code.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../common/common-security-starter/common-security-starter.iml" filepath="$PROJECT_DIR$/../common/common-security-starter/common-security-starter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../common/common-swagger-starter/common-swagger-starter.iml" filepath="$PROJECT_DIR$/../common/common-swagger-starter/common-swagger-starter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../sat-service/lpse/lpse.iml" filepath="$PROJECT_DIR$/../sat-service/lpse/lpse.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/sat-cloud.iml" filepath="$PROJECT_DIR$/.idea/sat-cloud.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../sat-service/sat-service.iml" filepath="$PROJECT_DIR$/../sat-service/sat-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../sat-service/user-service/user-service.iml" filepath="$PROJECT_DIR$/../sat-service/user-service/user-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../zuul-service/zuul-service.iml" filepath="$PROJECT_DIR$/../zuul-service/zuul-service.iml" />
+    </modules>
+  </component>
+</project>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hywx.userservice.mapper.RoleMapper">
+
+        <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+            id, role_name, role_desc
+       </sql>
+
+    <select id="findRolePage" parameterType="com.hywx.userservice.dao.Role" resultType="com.hywx.userservice.dao.Role">
+        SELECT
+        r.id,
+        r.role_name,
+        r.role_desc,
+        r.create_time ,
+        r.update_time,
+        GROUP_CONCAT( rr.resource_id ) resourceIds
+        FROM
+        sys_role r
+        LEFT JOIN sys_role_resource rr ON ( r.id = rr.role_id )
+        WHERE 1 = 1
+        <if test="role.roleName != null and role.roleName != ''">
+            AND r.role_name like CONCAT('%',#{role.roleName},'%')
+        </if>
+        GROUP BY r.id
+    </select>
+
+</mapper>

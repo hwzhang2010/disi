@@ -1,0 +1,110 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.hywx</groupId>
+    <artifactId>sat-service</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+  <groupId>com.hywx.sitm</groupId>
+  <artifactId>sitm</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>sitm</name>
+  <description>Digit Simulation Telemetering project for Spring Boot</description>
+  
+    <properties>
+		<java.version>1.8</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-quartz</artifactId>
+		</dependency>
+		<!-- springboot redis 缓存 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+		<!-- lettuce pool redis 缓存连接池，Lettuce的连接是基于Netty的，连接实例可以在多个线程间共享 -->
+		<dependency>
+		   <groupId>org.apache.commons</groupId>
+		   <artifactId>commons-pool2</artifactId>
+		</dependency>
+		<!-- MyBatis -->
+		<dependency>
+			<groupId>org.mybatis.spring.boot</groupId>
+			<artifactId>mybatis-spring-boot-starter</artifactId>
+			<version>2.1.2</version>
+		</dependency>
+		 <!-- SQLite3 驱动 -->   
+        <dependency>
+		    <groupId>org.xerial</groupId>
+		    <artifactId>sqlite-jdbc</artifactId>
+		</dependency>
+		<!-- fastjson -->
+		<dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.66</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.lmax/disruptor -->
+		<dependency>
+		    <groupId>com.lmax</groupId>
+		    <artifactId>disruptor</artifactId>
+		    <version>3.4.2</version>
+		</dependency>
+        
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+        <dependency>
+		    <groupId>junit</groupId>
+		    <artifactId>junit</artifactId>
+		    <scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<!-- 作用域范围为test -->
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+
+	<build>
+	    <finalName>sitm</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+				    <mainClass>com.hywx.sitm.SitmApplication</mainClass>
+				    <skipTests>true</skipTests> 
+				    <executable>true</executable>
+				</configuration>
+				<executions>
+			        <execution>
+			            <goals>
+			                <goal>repackage</goal>
+			            </goals>
+			        </execution>
+    			</executions>
+			</plugin>
+		</plugins>
+	</build>
+  
+</project>

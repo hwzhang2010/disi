@@ -1,0 +1,97 @@
+{"properties": [
+  {
+    "name": "localpath.multicast",
+    "type": "java.lang.String",
+    "description": "A description for 'localpath.multicast'"
+  },
+  {
+    "name": "filename.multicast",
+    "type": "java.lang.String",
+    "description": "A description for 'filename.multicast'"
+  },
+  {
+    "name": "myconfig.isNet",
+    "type": "java.lang.String",
+    "description": "A description for 'myconfig.isNet'"
+  },
+  {
+    "name": "myconfig.isNet",
+    "type": "java.lang.String",
+    "description": "A description for 'myconfig.isNet'"
+  },
+  {
+    "name": "myconfig.isNet",
+    "type": "java.lang.String",
+    "description": "A description for 'myconfig.isNet'"
+  },
+  {
+    "name": "myconfig.isNet",
+    "type": "java.lang.String",
+    "description": "A description for 'myconfig.isNet'"
+  },
+  {
+    "name": "myconfig.isNet",
+    "type": "java.lang.String",
+    "description": "A description for 'myconfig.isNet'"
+  },
+  {
+    "name": "myconfig.isNet",
+    "type": "java.lang.String",
+    "description": "A description for 'myconfig.isNet'"
+  },
+  {
+    "name": "myconfig.isNet",
+    "type": "java.lang.String",
+    "description": "A description for 'myconfig.isNet'"
+  },
+  {
+    "name": "myconfig.isNet",
+    "type": "java.lang.String",
+    "description": "A description for 'myconfig.isNet'"
+  },
+  {
+    "name": "myconfig.isNet",
+    "type": "java.lang.String",
+    "description": "A description for 'myconfig.isNet'"
+  },
+  {
+    "name": "myconfig.isNet",
+    "type": "java.lang.String",
+    "description": "A description for 'myconfig.isNet'"
+  },
+  {
+    "name": "myconfig.isNet",
+    "type": "java.lang.String",
+    "description": "A description for 'myconfig.isNet'"
+  },
+  {
+    "name": "myconfig.isNet",
+    "type": "java.lang.String",
+    "description": "A description for 'myconfig.isNet'"
+  },
+  {
+    "name": "filename.gps",
+    "type": "java.lang.String",
+    "description": "A description for 'filename.gps'"
+  },
+  {
+    "name": "localpath.gps",
+    "type": "java.lang.String",
+    "description": "A description for 'localpath.gps'"
+  },
+  {
+    "name": "myconfig.isNet",
+    "type": "java.lang.String",
+    "description": "A description for 'myconfig.isNet'"
+  },
+  {
+    "name": "myconfig.isNet",
+    "type": "java.lang.String",
+    "description": "A description for 'myconfig.isNet'"
+  },
+  {
+    "name": "myconfig.isNet",
+    "type": "java.lang.String",
+    "description": "A description for 'myconfig.isNet'"
+  }
+]}

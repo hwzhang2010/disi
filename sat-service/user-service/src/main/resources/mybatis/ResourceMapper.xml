@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hywx.userservice.mapper.ResourceMapper">
+
+        <!-- 通用查询映射结果 -->
+        <resultMap id="BaseResultMap" type="com.hywx.userservice.dao.Resource">
+                    <id column="id" property="id" />
+                    <result column="code" property="code" />
+                    <result column="name" property="name" />
+                    <result column="parent_id" property="parentId" />
+                    <result column="url" property="url" />
+                    <result column="type" property="type" />
+                    <result column="order_num" property="orderNum" />
+                    <result column="create_user" property="createUser" />
+                    <result column="create_time" property="createTime" />
+                    <result column="update_user" property="updateUser" />
+                    <result column="update_time" property="updateTime" />
+        </resultMap>
+
+        <!-- 通用查询结果列 -->
+        <sql id="Base_Column_List">
+            id, code, name, parent_id, url, type, order_num, create_user, create_time, update_user, update_time
+        </sql>
+
+
+    <select id="findUserPermissions" resultType="com.hywx.userservice.dao.Resource">
+        select distinct m.code
+        from sys_role r
+        left join sys_user_role ur on (r.id = ur.role_id)
+        left join sys_user u on (u.id= ur.user_id)
+        left join sys_role_resource rr on (rr.role_id = r.id)
+        left join sys_resource m on (m.id = rr.resource_id)
+        where u.username = #{userName}
+        and m.code is not null
+        and m.code &lt;&gt; ''
+        <if test="type != null and type != ''">
+            AND m.type = #{type}
+        </if>
+    </select>
+
+    <select id="findUserMenus" resultType="com.hywx.userservice.dao.Resource">
+        select m.*
+        from sys_resource m
+        where m.type &lt;&gt; 1
+        and m.id in
+        (select distinct rm.resource_id
+        from sys_role_resource rm
+        left join sys_role r on (rm.role_id = r.id)
+        left join sys_user_role ur on (ur.role_id = r.id)
+        left join sys_user u on (u.id = ur.user_id)
+        where u.username =  #{userName})
+        order by m.order_num
+    </select>
+
+    <select id="findUserPermissionsByParentId" resultType="com.hywx.userservice.dao.Resource">
+        select distinct m.code
+        from sys_role r
+        left join sys_user_role ur on (r.id = ur.role_id)
+        left join sys_user u on (u.id= ur.user_id)
+        left join sys_role_resource rr on (rr.role_id = r.id)
+        left join sys_resource m on (m.id = rr.resource_id)
+        where u.username = #{userName}
+        and m.code is not null
+        and m.code &lt;&gt; ''
+        and FIND_IN_SET(m.id,queryChildrenResource( #{parentId} ))
+    </select>
+
+    <select id="findUserMenusByParentId" resultType="com.hywx.userservice.dao.Resource">
+		select distinct m.*
+        from sys_role_resource rm
+        left join sys_role r on (rm.role_id = r.id)
+        left join sys_user_role ur on (ur.role_id = r.id)
+        left join sys_user u on (u.id = ur.user_id)
+				left join sys_resource m on rm.resource_id=m.id
+        where  u.username = #{userName}
+        and m.type &lt;&gt; 3
+        and FIND_IN_SET(m.id,queryChildrenResource( #{parentId} ))
+        and m.id &lt;&gt; #{parentId}
+        order by m.order_num
+    </select>
+
+</mapper>

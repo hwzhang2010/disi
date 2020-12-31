@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "localpath.gps",
+    "type": "java.lang.String",
+    "description": "A description for 'localpath.gps'"
+  },
+  {
+    "name": "filename.gps",
+    "type": "java.lang.String",
+    "description": "A description for 'filename.gps'"
+  }
+]}

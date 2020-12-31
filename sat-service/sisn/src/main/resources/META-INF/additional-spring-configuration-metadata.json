@@ -1,0 +1,17 @@
+{"properties": [
+  {
+    "name": "tinylog.writer",
+    "type": "java.lang.String",
+    "description": "A description for 'tinylog.writer'"
+  },
+  {
+    "name": "tinylog.level",
+    "type": "java.lang.String",
+    "description": "A description for 'tinylog.level'"
+  },
+  {
+    "name": "tinylog.configuration.observe",
+    "type": "java.lang.String",
+    "description": "A description for 'tinylog.configuration.observe'"
+  }
+]}

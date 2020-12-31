@@ -1,0 +1,25 @@
+package ${package.Service};
+
+import ${package.Entity}.${entity};
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import java.util.List;
+import com.hywx.common.core.entity.QueryRequest;
+
+/**
+ * @program: user-serice
+ * @description: $!{table.comment} service 接口
+ * @author ${author}
+ * @date ${date}
+ */
+public interface ${table.serviceName} extends ${superServiceClass}<${entity}> {
+
+    IPage<${entity}> getListByPage(QueryRequest queryRequest,${entity} ${table.entityPath});
+
+    int saveData(${entity} ${table.entityPath});
+
+    int updateData(${entity} ${table.entityPath});
+
+    int batchDelete(List<String> ids);
+}

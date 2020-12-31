@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>sat-service</artifactId>
+        <groupId>com.hywx</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.hywx</groupId>
+    <artifactId>user-service</artifactId>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+        <mybatisplus.version>3.1.0</mybatisplus.version>
+        <swagger.version>2.9.2</swagger.version>
+        <datasource.version>2.5.4</datasource.version>
+        <velocity.version>2.0</velocity.version>
+        <ip.version>1.7</ip.version>
+    </properties>
+
+    <dependencies>
+        <!-- 内部组件引用 -->
+        <!-- 配置中心 (如果没有加配置的时候需要注释掉，否则注册中心不是本地时候启动报错)-->
+        <!--<dependency>-->
+        <!--<groupId>org.springframework.cloud</groupId>-->
+        <!--<artifactId>spring-cloud-starter-consul-config</artifactId>-->
+        <!--</dependency>-->
+
+         <!--通用类工具类-->
+        <!--<dependency>-->
+            <!--<groupId>com.hywx</groupId>-->
+            <!--<artifactId>common-core</artifactId>-->
+            <!--<version>1.0-SNAPSHOT</version>-->
+        <!--</dependency>-->
+
+        <!-- swagger通用类工具类-->
+        <dependency>
+            <groupId>com.hywx</groupId>
+            <artifactId>common-swagger-starter</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+
+
+
+        <!-- 通用类权限类 包含了通用工具类,不需要权限时去掉-->
+        <dependency>
+            <groupId>com.hywx</groupId>
+            <artifactId>common-security-starter</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- consul注册中心 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-consul-discovery</artifactId>
+        </dependency>
+
+        <!-- 服务调用feign -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+
+        <!-- 健康监控 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- 熔断器可视化界面 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+        </dependency>
+
+        <!-- 熔断器可视化界面 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix-dashboard</artifactId>
+        </dependency>
+
+        <!-- 分布式链路追踪 -->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-zipkin</artifactId>-->
+<!--        </dependency>-->
+
+        <!-- 分布式链路追踪是用rabbitmq收集-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.amqp</groupId>-->
+<!--            <artifactId>spring-rabbit</artifactId>-->
+<!--        </dependency>-->
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>${mybatisplus.version}</version>
+        </dependency>
+
+        <!-- 多数据源 -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+            <version>${datasource.version}</version>
+        </dependency>
+
+        <!--免费的ip定位服务-->
+        <dependency>
+            <groupId>org.lionsoul</groupId>
+            <artifactId>ip2region</artifactId>
+            <version>${ip.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core</artifactId>
+            <version>RELEASE</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>

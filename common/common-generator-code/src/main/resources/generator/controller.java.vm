@@ -1,0 +1,149 @@
+package ${package.Controller};
+
+import java.util.List;
+
+import com.hywx.common.core.util.results.Resp;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.*;
+import com.hywx.common.core.entity.QueryRequest;
+import com.hywx.common.core.annotation.ControllerEndpoint;
+import com.hywx.common.core.entity.QueryRequest;
+
+import ${package.Entity}.${entity};;
+import ${package.Service}.${table.serviceName};
+
+/**
+ * @program: user-serice
+ * @description:
+ * @author ${author}
+ * @date ${${date}}
+ */
+@RestController
+@RequestMapping("/${entity}")
+public class ${entity}Controller {
+    private static final Logger LOGGER = LoggerFactory.getLogger(${entity}Controller.class);
+
+    @Autowired
+    private ${entity}Service ${table.entityPath}Service;
+
+    /**
+     * @method  getListByPage
+     * @description 列表查询
+     * @date: ${${date}}
+     * @author: ${author}
+     * @param queryRequest
+     * @param ${table.entityPath}
+     * @return Resp
+     */
+    @ApiOperation(value = "列表查询", httpMethod = "GET")
+    @GetMapping
+    @ControllerEndpoint(operation = "日志列表查询", exceptionMessage = "日志列表查询失败")
+    public Resp getListByPage(QueryRequest queryRequest, ${entity} ${table.entityPath}){
+        //查询列表数据
+        long startTime = System.currentTimeMillis();
+        if (queryRequest.getPageNo() < 1 || queryRequest.getPageNo() < 1) {
+            return Resp.getInstantiationError("分页查看失败，分页页数或分页大小不合法", null, null);
+        }
+        try {
+
+            IPage<${entity}> ${table.entityPath}List = ${table.entityPath}Service.getListByPage(queryRequest,${table.entityPath});
+            long endTime = System.currentTimeMillis();
+            LOGGER.info("分页列举成功，用时" + (endTime - startTime) + "ms");
+            return Resp.getInstantiationSuccess("分页查看", Resp.LIST, ${table.entityPath}List);
+        } catch (Exception e) {
+            long endTime = System.currentTimeMillis();
+            LOGGER.error("分页列举失败，原因："+ e.getMessage()+"，用时" + (endTime - startTime) + "ms");
+            return Resp.getInstantiationError("分页查看失败" + e.getMessage(), Resp.LIST, null);
+        }
+    }
+
+    /**
+     * @method  save
+     * @description 新增
+     * @date: ${date}
+     * @author: ${author}
+     * @param ${table.entityPath}
+     * @return Resp
+     */
+    @ApiOperation(value = "新增", httpMethod = "POST")
+    @PostMapping
+    @ControllerEndpoint(operation = "新增", exceptionMessage = "新增失败")
+    public Resp save(@RequestBody ${entity} ${table.entityPath}){
+        long startTime = System.currentTimeMillis();
+        if (null == ${table.entityPath}) {
+            return Resp.getInstantiationError("前端错误，参数为空", Resp.SINGLE, null);
+        }
+        try {
+                ${table.entityPath}Service.saveData(${table.entityPath});
+                long endTime = System.currentTimeMillis();
+                LOGGER.info("创建成功，用时" + (endTime - startTime) + "ms");
+                return Resp.getInstantiationSuccess("创建成功", Resp.SINGLE, null);
+        } catch (Exception e) {
+            long endTime = System.currentTimeMillis();
+            LOGGER.error("创建失败，原因：" + e.getMessage() + "，用时" + (endTime - startTime) + "ms");
+            return Resp.getInstantiationError("创建异常，原因：" + e.getMessage(), Resp.SINGLE, ${table.entityPath});
+        }
+    }
+
+    /**
+     * @method  update
+     * @description 编辑
+     * @date: ${date}
+     * @author: ${author}
+     * @param ${table.entityPath}
+     * @return Resp
+     */
+    @ApiOperation(value = "编辑", httpMethod = "PUT")
+    @PutMapping
+    @ControllerEndpoint(operation = "编辑", exceptionMessage = "编辑失败")
+    public Resp update(@RequestBody  ${entity} ${table.entityPath}){
+        long startTime =  System.currentTimeMillis();
+        try {
+            //更新
+                if(${table.entityPath}Service.getById(${table.entityPath}.getId()) == null){
+                    long endTime = System.currentTimeMillis();
+                    LOGGER.error("修改失败，原因：修改不存在，用时" + (endTime - startTime) + "ms");
+                    return Resp.getInstantiationError("修改失败，原因：修改的id不存在，", null, null);
+                }
+                ${table.entityPath}Service.updateData(${table.entityPath});
+                long endTime =  System.currentTimeMillis();
+                LOGGER.info("修改成功，用时" + (endTime - startTime) + "ms");
+                return Resp.getInstantiationSuccess("修改成功", null, null);
+        } catch (Exception e) {
+            long endTime = System.currentTimeMillis();
+            LOGGER.error("修改失败，原因："+ e.getMessage() +"，用时" + (endTime - startTime) + "ms");
+            return Resp.getInstantiationError("修改失败：" + e.getMessage(), null, null);
+        }
+    }
+
+
+    /**
+     * @method  batchDelete
+     * @description 根据id批量删除
+     * @date: ${date}
+     * @author: ${author}
+     * @param  ids
+     * @return Resp
+     */
+    @ApiOperation(value = "根据id批量删除",httpMethod = "DELETE")
+    @DeleteMapping
+    @ControllerEndpoint(operation = "根据id批量删除", exceptionMessage = "根据id批量删除失败")
+    public Resp batchDelete(@RequestParam("ids") List<String> ids){
+        long startTime = System.currentTimeMillis();
+        try {
+                ${table.entityPath}Service.batchDelete(ids);
+                long endTime = System.currentTimeMillis();
+                LOGGER.info("批量删除成功,用时:" + (endTime-startTime) + "ms");
+                return Resp.getInstantiationSuccess("批量删除成功", Resp.LIST, null);
+        } catch (Exception e) {
+            long endTime = System.currentTimeMillis();
+            LOGGER.error("批量删除失败，原因："+ e.getMessage()+"，用时" + (endTime - startTime) + "ms");
+            return Resp.getInstantiationError("批量删除失败:"+e.getMessage(), Resp.LIST, null);
+        }
+    }
+
+}

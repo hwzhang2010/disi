@@ -1,0 +1,74 @@
+1. 将自己的服务放到 sta-service下面
+
+2. 自己服务里面添加 通用类工具类 可使用通用方法
+ <!--通用类工具类-->
+        <!--<dependency>-->
+            <!--<groupId>com.hywx</groupId>-->
+            <!--<artifactId>common-core</artifactId>-->
+            <!--<version>1.0-SNAPSHOT</version>-->
+        <!--</dependency>-->
+3.添加权限
+pom中添加
+ <!-- 通用类权限类 包含了通用工具类,不需要权限时去掉-->
+<dependency>
+            <groupId>com.hywx</groupId>
+            <artifactId>common-security</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+启动类添加 @EnableCloudSecurity
+
+配置类添加
+
+security:
+  oauth2:
+    resource:
+      id: ${spring.application.name}
+      user-info-uri: http://localhost:8092/auth/user
+
+hywx:
+  cloud:
+    security:
+      # 配置免认证的url
+      anon-uris: /actuator/**,/user/register,/swagger-ui.html,/webjars/**,/swagger-resources/**,/v2/api-docs/**,/,/csrf
+      # 配置是否通过网关访问，默认true
+      onlyFetchByGateway: true
+
+代码里面可添加controller权限 如 @PreAuthorize("hasAuthority('user:update')")，和使用SecurityUtil.getCurrentUsername()获取当前用户
+
+
+4. 配置类swagger
+
+pom中添加
+
+ <!-- swagger通用类工具类-->
+        <dependency>
+            <groupId>com.hywx</groupId>
+            <artifactId>common-swagger</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+配置文件添加
+
+#swagger 配置
+swagger:
+  doc:
+    enable: true
+    basePackage: com.hywx.userservice.controller
+    title: ${spring.application.name}文档
+    description: ${swagger.doc.title}
+    version: 1.0
+    author: tang
+    url: http://locahost:8090
+    email: 773796932@qq.com
+    grantUrl: http://localhost:8092/auth/oauth/token  ## 认证中心地址
+    name: gw_user_swagger
+    scope: test
+
+5. swagger 集成网关
+
+在zuul-service里面 配置
+
+#网关集成swagger
+swagger:
+  doc:
+    resources: user-service,auth-service 

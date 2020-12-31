@@ -1,0 +1,84 @@
+ ## 日志配置
+logging:
+  level:
+    root: info
+    com.hywx.gw.userservice: debug
+
+spring:
+  application:
+    name: gateway
+  cloud:
+    consul:
+      host: 10.81.22.192 #consul 注册中心地址
+      port: 8500
+      discovery:
+        register: true
+        failFast: true
+        enabled: true
+        register-health-check: true
+        hostname: 10.81.22.194  #本机地址
+        serviceName: ${spring.application.name}
+        instanceId: gateway_jenkins
+        tags: service,gateway
+        healthCheckPath: /actuator/health
+        health-check-interval: 10s
+#  redis:
+#    database: 0
+#    host: 10.81.22.190
+#    port: 6379
+#    jedis:
+#      pool:
+#        min-idle: 8
+#        max-idle: 500
+#        max-active: 2000
+#        max-wait: 10000
+#    timeout: 5000
+  #端口配置
+zuul:
+  routes:
+    auth:
+      path: /auth/**
+      serviceId: auth-server
+      sensitiveHeaders: "*"
+    system:
+      path: /system/**
+      serviceId: user-service
+      sensitiveHeaders: "*"
+    duty:
+      path: /duty/**
+      serviceId: duty-service
+      sensitiveHeaders: "*"
+    test:
+      path: /test/**
+      serviceId: hywx-server-test
+      sensitiveHeaders: "*"
+    taskplan:
+      path: /taskplan/**
+      serviceId: taskplan-service
+      sensitiveHeaders: "*"
+    meteorological:
+      path: /meteorological/**
+      serviceId: meteorological-service
+      sensitiveHeaders: "*"
+  retryable: true  #开启重试机制
+  ignored-services: "*"
+  ribbon:
+    eager-load:
+      enabled: true
+  SendErrorFilter:
+      error:
+        disable: true
+
+ribbon:
+  ReadTimeout: 10000
+
+server:
+  port: 6092
+#  servlet:
+#    context-path: /auth-server/v1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,info,health

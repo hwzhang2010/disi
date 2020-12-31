@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>sat-cloud</artifactId>
+        <groupId>com.hywx</groupId>
+        <version>1.0-SNAPSHOT</version>
+        <relativePath>../sat-cloud/pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>common</artifactId>
+    <packaging>pom</packaging>
+    <name>common</name>
+    <description>通用模块工具类</description>
+    <modules>
+        <module>common-security-starter</module>
+        <module>common-core</module>
+        <module>common-generator-code</module>
+        <module>common-swagger-starter</module>
+        <module>common-cas-starter</module>
+    </modules>
+</project>

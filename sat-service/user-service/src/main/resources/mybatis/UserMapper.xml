@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hywx.userservice.mapper.UserMapper">
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, username, password, mobile, organization, status, create_user, create_time, update_user, update_time, remark
+    </sql>
+
+    <select id="getUserListPage" parameterType="com.hywx.userservice.vo.UserSearchVo" resultType="com.hywx.userservice.dao.User">
+        select u.id, u.username,u.password,u.mobile,u.org_id,u.last_login_time,u.sex,u.email,u.avatar, u.status, u.create_user, u.create_time, u.update_user, u.update_time, u.remark,o.organization_name as orgName,GROUP_CONCAT(r.role_name ) as roleName,GROUP_CONCAT(r.id) as roleId
+        from sys_user u
+        left join sys_organization o on u.org_id=o.id
+        left join sys_user_role ur on ur.user_id=u.id
+        left join sys_role r on r.id=ur.role_id
+        WHERE 1 = 1
+        <if test="searchVo.username != null and searchVo.username != ''">
+            AND u.username = #{searchVo.username}
+        </if>
+
+        <if test="searchVo.orgName != null and searchVo.orgName != ''">
+            AND o.organization_name like CONCAT('%',#{searchVo.orgName},'%')
+        </if>
+        <if test="searchVo.startTime != null and searchVo.startTime !=''">
+            And u.create_time &gt; #{searchVo.startTime}
+        </if>
+        <if test="searchVo.stopTime!= null and searchVo.stopTime !=''">
+            And u.create_time &lt; #{searchVo.stopTime}
+        </if>
+        group by  u.id,o.organization_name
+        <if test="_parameter.containsKey('ew') and ew!= null">
+            ${ew.customSqlSegment}
+        </if>
+
+    </select>
+
+</mapper>

@@ -1,0 +1,126 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.hywx</groupId>
+    <artifactId>sat-service</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+  <groupId>com.hywx.sirs</groupId>
+  <artifactId>sirs</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>sirs</name>
+  <description>Digit Simulation Receive And Send project for Spring Boot</description>
+  
+  
+    <properties>
+		<java.version>1.8</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-rest</artifactId>
+		</dependency>	 
+		<!-- netty-all -->
+		<dependency>
+		    <groupId>io.netty</groupId>
+		    <artifactId>netty-all</artifactId>
+		</dependency>
+		<!-- fastjson -->
+		<dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.66</version>
+        </dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<!-- 热部署模块 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<optional>false</optional> <!-- 这个需要为 true 热部署才有效 -->
+		</dependency>
+		
+		<!--通用类工具类-->
+		<!--  
+	    <dependency>
+            <groupId>com.hywx</groupId>
+            <artifactId>common-core</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        -->
+        <!-- swagger通用类工具类-->
+        <!--
+        <dependency>
+            <groupId>com.hywx</groupId>
+            <artifactId>common-swagger-starter</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        -->
+       
+	  <dependency>
+          <groupId>io.springfox</groupId>
+          <artifactId>springfox-swagger2</artifactId>
+          <version>2.9.2</version>
+      </dependency>
+      <dependency>
+          <groupId>io.springfox</groupId>
+          <artifactId>springfox-swagger-ui</artifactId>
+          <version>2.9.2</version>
+      </dependency>
+      <dependency>
+          <groupId>org.springframework.security</groupId>
+          <artifactId>spring-security-web</artifactId>
+      </dependency>
+
+		<dependency>
+		    <groupId>junit</groupId>
+		    <artifactId>junit</artifactId>
+		    <scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+
+	<build>
+	<finalName>sirs</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+				    <mainClass>com.hywx.sirs.SirsApplication</mainClass>
+				    <skipTests>true</skipTests> 
+				</configuration>
+				<executions>
+			        <execution>
+			            <goals>
+			                <goal>repackage</goal>
+			            </goals>
+			        </execution>
+    			</executions>
+			</plugin>
+		</plugins>
+	</build>
+  
+  
+  
+</project>
