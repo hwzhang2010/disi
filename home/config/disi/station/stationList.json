@@ -1,0 +1,34 @@
+[
+    {
+        "name": "beijing",
+        "scode": "0x01110000",
+        "recvIP": "192.168.1.143",
+		"recvPort": "20000",
+		"sendIP": "192.168.1.38",
+		"sendPort": "10001"
+    },
+    {
+        "name": "chuxiong",
+        "scode": "0x01120000",
+        "recvIP": "192.168.1.143",
+		"recvPort": "20001",
+		"sendIP": "192.168.1.38",
+		"sendPort": "10001"
+    },
+	{
+        "name": "wulumuqi",
+        "scode": "0x01130000",
+        "recvIP": "192.168.1.143",
+		"recvPort": "20002",
+		"sendIP": "192.168.1.38",
+		"sendPort": "10001"
+    },
+	{
+        "name": "xian",
+        "scode": "0x01140000",
+        "recvIP": "192.168.1.143",
+		"recvPort": "20003",
+		"sendIP": "192.168.1.38",
+		"sendPort": "10001"
+    },
+]
