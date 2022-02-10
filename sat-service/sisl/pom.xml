@@ -142,7 +142,6 @@
 			  <configuration>
 				  <mainClass>com.hywx.sisl.SislApplication</mainClass>
 				  <skipTests>true</skipTests> 
-				  <executable>true</executable>
 			  </configuration>
 			  <executions>
 			      <execution>

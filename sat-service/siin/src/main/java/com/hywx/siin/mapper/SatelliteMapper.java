@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import com.hywx.siin.po.SatelliteInfo;
 import com.hywx.siin.po.GpsFrame;
+import com.hywx.siin.po.SatelliteBusiness;
 
 @Mapper
 @Component
@@ -45,6 +46,10 @@ public interface SatelliteMapper {
 	@Select("SELECT 1 FROM T_SATELLITE WHERE SATELLITEID = #{satelliteId} AND ISUSED = 1 LIMIT 1")
 	Boolean existSatellite(String satelliteId);
 	
+	// 根据卫星ID查询卫星信息
+	@Select("SELECT SATELLITEID, SATELLITENAME, SATELLITETEXT, ISUSED FROM T_SATELLITE WHERE SATELLITEID = #{satelliteId} AND ISUSED = 1")
+	SatelliteInfo getSatelliteById(String satelliteId);
+	
 	// 插入卫星描述信息到数据库
 	@Insert("INSERT OR IGNORE INTO T_SATELLITE(SATELLITEID, SATELLITENAME, SATELLITETEXT, ISUSED) "
 			+ "VALUES(#{satelliteId}, #{satelliteName}, #{satelliteText}, 1)")
@@ -58,6 +63,23 @@ public interface SatelliteMapper {
 	@Update("UPDATE T_SATELLITE SET SATELLITENAME=#{satelliteName}, SATELLITETEXT=#{satelliteText} WHERE SATELLITEID = #{satelliteId}")  
     int update(@Param("satelliteName") String satelliteName, @Param("satelliteText") String satelliteText, @Param("satelliteId") String satelliteId);
 	
+	
+	/*******************************************************************/
+	// 查询所有卫星运营信息
+	@Select("SELECT SATELLITEID, USAGE, CONDITION, HEALTH FROM T_SATELLITE_BUSINESS")
+	List<SatelliteBusiness> listBusinesses();
+	
+	// 根据卫星ID查询卫星运营信息是否存在
+	@Select("SELECT 1 FROM T_SATELLITE_BUSINESS WHERE SATELLITEID = #{satelliteId} LIMIT 1")
+	Boolean existBusiness(String satelliteId);
+	
+	// 添加卫星运营信息
+	@Insert("INSERT OR IGNORE INTO T_SATELLITE_BUSINESS(SATELLITEID, USAGE, CONDITION, HEALTH) VALUES(#{satelliteId}, #{usage}, #{condition}, #{health})")
+	int insertBusiness(@Param("satelliteId") String satelliteId, @Param("usage") double usage, @Param("condition") String condition, @Param("health") String health);
+	
+	// 根据卫星ID更新卫星运营信息
+	@Update("UPDATE T_SATELLITE_BUSINESS SET USAGE=#{usage}, CONDITION=#{condition}, HEALTH=#{health}  WHERE SATELLITEID = #{satelliteId}")  
+	int updateBusiness(@Param("usage") double usage, @Param("condition") String condition, @Param("health") String health, @Param("satelliteId") String satelliteId);
 	
 	
 }

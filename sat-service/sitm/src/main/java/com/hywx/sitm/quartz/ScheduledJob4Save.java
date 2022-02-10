@@ -7,14 +7,9 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 
 import com.hywx.sitm.bo.SitmSave;
-import com.hywx.sitm.bo.SitmType;
-import com.hywx.sitm.config.MyConfig;
-import com.hywx.sitm.global.GlobalAccess;
 import com.hywx.sitm.global.GlobalQueue;
-import com.hywx.sitm.redis.RedisFind;
 import com.hywx.sitm.service.TcService;
 
 public class ScheduledJob4Save implements Job {

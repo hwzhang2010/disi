@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -12,20 +13,31 @@ import javax.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.github.amsacode.predict4java.GroundStationPosition;
+import com.github.amsacode.predict4java.SatPos;
+import com.github.amsacode.predict4java.Satellite;
+import com.github.amsacode.predict4java.SatelliteFactory;
+import com.github.amsacode.predict4java.TLE;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hywx.siin.common.Page;
 import com.hywx.siin.config.FileConfig;
+import com.hywx.siin.mapper.OrbitMapper;
 import com.hywx.siin.mapper.SatelliteMapper;
 import com.hywx.siin.po.GpsFrame;
+import com.hywx.siin.po.SatelliteBusiness;
 import com.hywx.siin.po.SatelliteInfo;
+import com.hywx.siin.po.SatelliteTle;
 import com.hywx.siin.service.SatelliteService;
+import com.hywx.siin.vo.SatelliteBusinessVO;
 
 @Service("satelliteService")
 public class SatelliteServiceImpl implements SatelliteService {
 
 	@Resource
     private SatelliteMapper satelliteMapper;
+	@Resource
+	private OrbitMapper orbitMapper;
 	
 	@Autowired
 	private FileConfig fileConfig;
@@ -135,6 +147,12 @@ public class SatelliteServiceImpl implements SatelliteService {
 		
 		return exist;
 	}
+	
+	@Override
+	public SatelliteInfo getSatelliteById(String satelliteId) {
+		
+		return satelliteMapper.getSatelliteById(satelliteId);
+	}
 
 	@Override
 	public int insert(String satelliteId, String satelliteName, String satelliteText) {
@@ -152,6 +170,71 @@ public class SatelliteServiceImpl implements SatelliteService {
 		
 		return satelliteMapper.update(satelliteName, satelliteText, satelliteId);
 	}
+
+	@Override
+	public List<SatelliteBusiness> listBusinesses() {
+		
+		return satelliteMapper.listBusinesses();
+	}
+	
+	@Override
+	public Boolean existBusiness(String satelliteId) {
+		
+		return satelliteMapper.existBusiness(satelliteId);
+	}
+
+	@Override
+	public int insertBusiness(String satelliteId, double usage, String condition, String health) {
+		
+		return satelliteMapper.insertBusiness(satelliteId, usage, condition, health);
+	}
+
+	@Override
+	public int updateBusiness(double usage, String condition, String health, String satelliteId) {
+		
+		return satelliteMapper.updateBusiness(usage, condition, health, satelliteId);
+	}
+
+	@Override
+	public List<SatelliteBusinessVO> listSatelliteBusinesses(Long timeStamp) {
+		List<SatelliteBusinessVO> list = new ArrayList<>();
+		
+		Date date = new Date(timeStamp);
+		// 使用北京的地理坐标作为地面站进行计算卫星的位置
+		GroundStationPosition groundStationPosition = new GroundStationPosition(116, 39, 0);
+		List<SatelliteBusiness> businessList = satelliteMapper.listBusinesses();
+		for (int i = 0; i < businessList.size(); i++) {
+			SatelliteBusiness business = businessList.get(i);
+			// 实例化TLE
+		    SatelliteTle satelliteTle = orbitMapper.getTle(business.getSatelliteId());
+		    // 实例化SGP4计算的卫星
+		    Satellite satellite = SatelliteFactory.createSatellite(new TLE(satelliteTle.getTle()));
+		    SatPos satPos = satellite.getPosition(groundStationPosition, date);
+		    // 卫星的星下点位置
+			double lng = satPos.getLongitude() * 180 / Math.PI;
+			double lat = satPos.getLatitude() * 180 / Math.PI;
+			SatelliteBusinessVO vo = new SatelliteBusinessVO(business.getSatelliteId(), lng, lat, business);
+			list.add(vo);
+		}
+		
+		return list;
+	}
+
+	@Override
+	public int updateSatelliteBusiness(String satelliteId, double usage, String condition, String health) {
+		int result = 0;
+		
+		if (satelliteMapper.existBusiness(satelliteId)) {
+			result = satelliteMapper.updateBusiness(usage, condition, health, satelliteId);
+		} else {
+			result = satelliteMapper.insertBusiness(satelliteId, usage, condition, health);
+		}
+		
+		return result;
+	}
+
+
+	
 
 	
 

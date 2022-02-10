@@ -63,6 +63,27 @@ public class GlobalAccess {
 			sitmGpsFromExternalMap.put(satelliteIdList.get(i), new SitmGpsFromExternal());
 		}
 	}
+	
+	//判断是否有外测GPS数据
+	public static Map<String, Boolean> sitmGpsArrivedMap;
+	public static Boolean getSitmGpsArrived(String satelliteId) {
+		if (isInGroup(satelliteId)) 
+			return sitmGpsArrivedMap.get(satelliteId);
+			
+		return false;
+	}
+	public static void putSitmGpsArrived(String satelliteId, Boolean arrived) {
+		if (sitmGpsArrivedMap == null)
+			sitmGpsArrivedMap = new ConcurrentHashMap<>();
+		
+		sitmGpsArrivedMap.put(satelliteId, arrived);
+	} 
+	public static void setSitmGpsArrived(List<String> satelliteIdList) {
+		sitmGpsArrivedMap = new ConcurrentHashMap<>();
+		for (int i = 0; i < satelliteIdList.size(); i++) {
+			sitmGpsArrivedMap.put(satelliteIdList.get(i), false);
+		}
+	}
 		
 	
 	//GPS数据源, 自动发送使用
@@ -72,7 +93,7 @@ public class GlobalAccess {
     	    return null;
     		
 		int index = gpsFrameCountMap.get(satelliteId);
-		setGpsFrameCountMap(satelliteId, index + 1);
+		//setGpsFrameCountMap(satelliteId, index + 1);
 		
 		return gpsFrameVector.get(index);
 	}
@@ -95,7 +116,10 @@ public class GlobalAccess {
 		
 		gpsFrameCountMap.put(satelliteId, index);
 	}
-	
+	public static void incrementGpsFrameCountMap(String satelliteId) {
+		int index = gpsFrameCountMap.get(satelliteId);
+		setGpsFrameCountMap(satelliteId, index + 1);
+	}
 	
 	
 	

@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Component;
 
+import com.hywx.siin.po.GroundStationBusiness;
 import com.hywx.siin.po.GroundStationInfo;
 
 @Mapper
@@ -43,5 +44,24 @@ public interface GroundStationMapper {
 	// 根据信关站ID更新信关站描述信息
 	@Update("UPDATE T_GROUNDSTATION SET GROUNDSTATIONNAME=#{groundStationName}, GROUNDSTATIONTEXT=#{groundStationText}, GROUNDSTATIONLONGITUDE=#{groundStationLng}, GROUNDSTATIONLATITUDE=#{groundStationLat}, GROUNDSTATIONALTITUDE=#{groundStationAlt} WHERE GROUNDSTATIONID = #{groundStationId}")  
     int update(@Param("groundStationName") String groundStationName, @Param("groundStationText") String groundStationText, @Param("groundStationLng") double groundStationLng, @Param("groundStationLat") double groundStationLat, @Param("groundStationAlt") double groundStationAlt, @Param("groundStationId") String groundStationId);
+	
+	/*************************************************************************/
+	// 查询所有信关站运营信息
+	@Select("SELECT GROUNDSTATIONID, USAGE, EQUIPMENT, CARRIER, HEALTH FROM T_GROUNDSTATION_BUSINESS")
+	List<GroundStationBusiness> listBusinesses();
+	
+	// 根据信关站ID查询信关站运营信息是否存在
+	@Select("SELECT 1 FROM T_GROUNDSTATION_BUSINESS WHERE GROUNDSTATIONID = #{groundStationId} LIMIT 1")
+	Boolean existBusiness(String groundStationId);
+		
+	// 添加信关站运营信息
+	@Insert("INSERT OR IGNORE INTO T_GROUNDSTATION_BUSINESS(GROUNDSTATIONID, USAGE, EQUIPMENT, CARRIER, HEALTH) VALUES(#{groundStationId}, #{usage}, #{equipment}, #{carrier}, #{health})")
+	int insertBusiness(@Param("groundStationId") String groundStationId, @Param("usage") double usage, @Param("equipment") String equipment, @Param("carrier") String carrier, @Param("health") String health);
+		
+		
+	// 根据信关站ID更新信关站运营信息
+	@Update("UPDATE T_GROUNDSTATION_BUSINESS SET USAGE=#{usage}, EQUIPMENT=#{equipment}, CARRIER=#{carrier}, HEALTH=#{health}  WHERE GROUNDSTATIONID = #{groundStationId}")  
+	int updateBusiness(@Param("usage") double usage, @Param("equipment") String equipment, @Param("carrier") String carrier, @Param("health") String health, @Param("groundStationId") String groundStationId);
+	
 	
 }

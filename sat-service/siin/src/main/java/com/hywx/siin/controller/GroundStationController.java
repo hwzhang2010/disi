@@ -14,6 +14,7 @@ import com.hywx.siin.common.Page;
 import com.hywx.siin.common.Resp;
 import com.hywx.siin.po.GroundStationInfo;
 import com.hywx.siin.service.GroundStationService;
+import com.hywx.siin.vo.GroundStationBusinessVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -38,7 +39,7 @@ public class GroundStationController {
 	
 	@CrossOrigin  //跨域访问
 	@RequestMapping(value = "api/v1/siin/groundstations/page", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
-	public Resp listSatellitesByPage(@RequestBody JSONObject param) {
+	public Resp listGroundStationsByPage(@RequestBody JSONObject param) {
 		System.out.println("siin groundstations page param:" + param);
 		Integer currentPage = param.getInteger("currentPage");
 		Integer pageSize = param.getInteger("pageSize");
@@ -50,18 +51,22 @@ public class GroundStationController {
 	
 	@CrossOrigin  //跨域访问
 	@RequestMapping(value = "api/v1/siin/groundstation/exist", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
-	public Resp existSatellite(@RequestBody JSONObject param) {
+	public Resp existGroundStation(@RequestBody JSONObject param) {
 		System.out.println("siin groundstation exist param:" + param);
 		String groundStationId = param.getString("groundStationId");
 		
 		Boolean exist = groundStationService.existGroundStation(groundStationId);
-		 
-        return Resp.getInstantiationSuccessString("siin groundstation exist", exist);
+		if (!exist)
+			return Resp.getInstantiationErrorJsonString(String.format("信关站ID%s不存在", groundStationId), false);
+		
+		GroundStationInfo info = groundStationService.getGroundStationById(groundStationId);
+		
+        return Resp.getInstantiationSuccessJsonString("siin groundstation exist", info);
 	}
 	
 	@CrossOrigin  //跨域访问
 	@RequestMapping(value = "api/v1/siin/groundstation/insert", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
-	public Resp insertSatellite(@RequestBody JSONObject param) {
+	public Resp insertGroundStation(@RequestBody JSONObject param) {
 		System.out.println("siin groundstation insert param:" + param);
 		String groundStationId = param.getString("groundStationId");
 		String groundStationName = param.getString("groundStationName");
@@ -77,7 +82,7 @@ public class GroundStationController {
 	
 	@CrossOrigin  //跨域访问
 	@RequestMapping(value = "api/v1/siin/groundstation/delete", method = RequestMethod.DELETE, consumes = "application/json", produces = "application/json")
-	public Resp deleteSatellite(@RequestBody JSONObject param) {
+	public Resp deleteGroundStation(@RequestBody JSONObject param) {
 		System.out.println("siin groundstation delete param:" + param);
 		String groundStationId = param.getString("groundStationId");
 		
@@ -88,7 +93,7 @@ public class GroundStationController {
 	
 	@CrossOrigin  //跨域访问
 	@RequestMapping(value = "api/v1/siin/groundstation/update", method = RequestMethod.PUT, consumes = "application/json", produces = "application/json")
-	public Resp updateSatellite(@RequestBody JSONObject param) {
+	public Resp updateGroundStation(@RequestBody JSONObject param) {
 		System.out.println("siin groundstation udpate param:" + param);
 		String groundStationId = param.getString("groundStationId");
 		String groundStationName = param.getString("groundStationName");
@@ -101,6 +106,32 @@ public class GroundStationController {
 		 
         return Resp.getInstantiationSuccessString("siin groundstation udpate", update);
 	}
+	
+	@CrossOrigin  //跨域访问
+	@RequestMapping(value = "api/v1/siin/groundstation/business/list", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+	public Resp listGroundStationBusiness(@ApiParam(value = "", required = false) @RequestBody JSONObject param) {
+		System.out.println("siin groundstation business param:" + param);
+		
+		List<GroundStationBusinessVO> list = groundStationService.listGroundStationBusinesses();
+		 
+        return Resp.getInstantiationSuccessList("siin groundstation business", list);
+	}
+	
+	@CrossOrigin  //跨域访问
+	@RequestMapping(value = "api/v1/siin/groundstation/business/update", method = RequestMethod.PUT, consumes = "application/json", produces = "application/json")
+	public Resp updateGroundStationBusiness(@RequestBody JSONObject param) {
+		System.out.println("siin groundstation business udpate param:" + param);
+		String groundStationId = param.getString("groundStationId");
+		double usage = param.getDoubleValue("usage");
+		String equipment = param.getString("equipment");
+		String carrier = param.getString("carrier");
+		String health = param.getString("health");
+		
+		int update = groundStationService.updateGroundStationBusiness(groundStationId, usage, equipment, carrier, health);
+		 
+        return Resp.getInstantiationSuccessString("siin groundstation business udpate", update);
+	}
+	
 	
 
 }

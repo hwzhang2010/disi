@@ -14,6 +14,7 @@ public class TmRsltFrameVO implements Cloneable {
 	private int bd;
 	private String srcType;
 	private String paramType;
+	private String range;
 	private double coefficient;
 	private String value;
 	
@@ -28,6 +29,7 @@ public class TmRsltFrameVO implements Cloneable {
 		this.paramType = SitmParamEnum.Constant.getName();
 		if (frame.getId() < 16)
 			this.paramType = SitmParamEnum.Cmd.getName();
+		this.range = frame.getRange();
 		this.coefficient = 1;
 		this.value = "1";
 
@@ -90,6 +92,14 @@ public class TmRsltFrameVO implements Cloneable {
 		this.paramType = paramType;
 	}
 
+	public String getRange() {
+		return range;
+	}
+
+	public void setRange(String range) {
+		this.range = range;
+	}
+
 	public double getCoefficient() {
 		return coefficient;
 	}
@@ -116,10 +126,15 @@ public class TmRsltFrameVO implements Cloneable {
 
 	@Override
 	public String toString() {
-		return "TmRsltFrameVO: {id=" + id + ", codeName=" + codeName + ", name=" + name + ", bd=" + bd + ", srcType=" + srcType
-				+ ", paramType=" + paramType + ", coefficient=" + coefficient + ", value=" + value + "}" 
-				+ System.getProperty("line.separator");
+		return "TmRsltFrameVO: {id=" + id + ", codeName=" + codeName + ", name=" + name + ", bd=" + bd + ", srcType="
+				+ srcType + ", paramType=" + paramType + ", range=" + range + ", coefficient=" + coefficient
+				+ ", value=" + value + "}";
 	}
+
+	
+    
+	
+
 	
 	
 

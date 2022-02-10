@@ -6,10 +6,16 @@ package com.hywx.sitm.global;
  *
  */
 public class GlobalConstant {
+	// 遥测参数表名称前缀(表名: 前缀 + 卫星ID)
+	public static final String TM_TABLENAME_PREFIX = "RTFRAMEPARAMETER_";
+	
 	// 帧头字节长度
 	public static final int FRAME_HEADER_LENGTH = 32;
 	// 遥测源码有效字节长度
 	public static final int FRAME_TM_LENGTH = 1024;
+	
+	// 地球自转角速度
+	public static final double WZ = 7.2921151467e-5;
 	
 	//使用二分法查找，必须先排序, GPS的参数
 	public static final String[] GPS_PARAMS = { "GPS_PosX", "GPS_PosY", "GPS_PosZ", "GPS_Second", "GPS_SpeedX", "GPS_SpeedY", "GPS_SpeedZ", "GPS_Week" };
@@ -28,8 +34,8 @@ public class GlobalConstant {
 	public static final long DID = 0x00100000;
 	
 	// BID, 遥测源码
-	public static long BID_TM = 0x00000090;
-	//public static long BID_TM = 0x00009000;
+	//public static long BID_TM = 0x00000090;
+	public static long BID_TM = 0x00009000;
 	// BID, GPS
 	public static long BID_GPS = 0x000000F1;
     // BID, 测距测速

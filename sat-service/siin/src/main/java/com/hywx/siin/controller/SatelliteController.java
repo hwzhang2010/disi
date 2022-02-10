@@ -15,6 +15,7 @@ import com.hywx.siin.common.Resp;
 import com.hywx.siin.po.GpsFrame;
 import com.hywx.siin.po.SatelliteInfo;
 import com.hywx.siin.service.SatelliteService;
+import com.hywx.siin.vo.SatelliteBusinessVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -87,8 +88,12 @@ public class SatelliteController {
 		String satelliteId = param.getString("satelliteId");
 		
 		Boolean exist = satelliteService.existSatellite(satelliteId);
-		 
-        return Resp.getInstantiationSuccessString("siin satellite exist", exist);
+		if (!exist)
+			return Resp.getInstantiationErrorJsonString(String.format("卫星ID%s不存在", satelliteId), false);
+		
+		SatelliteInfo info = satelliteService.getSatelliteById(satelliteId);
+		
+        return Resp.getInstantiationSuccessJsonString("siin satellite exist", info);
 	}
 	
 	@CrossOrigin  //跨域访问
@@ -129,8 +134,33 @@ public class SatelliteController {
 	}
 	
 	
+	@CrossOrigin  //跨域访问
+	@RequestMapping(value = "api/v1/siin/satellite/business/list", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+	public Resp listSatelliteBusiness(@ApiParam(value = "", required = false) @RequestBody JSONObject param) {
+		System.out.println("siin satellite business param:" + param);
+		Long timeStamp = param.getLong("timeStamp");
+		
+		List<SatelliteBusinessVO> list = satelliteService.listSatelliteBusinesses(timeStamp);
+		 
+        return Resp.getInstantiationSuccessList("siin satellite business", list);
+	}
 	
-	
+	@CrossOrigin  //跨域访问
+	@RequestMapping(value = "api/v1/siin/satellite/business/update", method = RequestMethod.PUT, consumes = "application/json", produces = "application/json")
+	public Resp updateSatelliteBusiness(@RequestBody JSONObject param) {
+		System.out.println("siin satellite business udpate param:" + param);
+		String satelliteId = param.getString("satelliteId");
+		double usage = param.getDoubleValue("usage");
+		String condition = param.getString("condition");
+		String health = param.getString("health");
+		
+		if (!satelliteService.existSatellite(satelliteId))
+			return Resp.getInstantiationErrorString(String.format("卫星ID%s不存在", satelliteId), false);
+		
+		int update = satelliteService.updateBusiness(usage, condition, health, satelliteId);
+		 
+        return Resp.getInstantiationSuccessString("siin satellite business udpate", update);
+	}
 	
 	
 	

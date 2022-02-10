@@ -3,19 +3,18 @@ package com.hywx.sirs.service;
 
 import java.io.File;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.hywx.sirs.bo.StationData;
 import com.hywx.sirs.bo.bid.AbstractBidOperation;
 import com.hywx.sirs.bo.bid.BidOperationFactory;
 import com.hywx.sirs.config.FileConfig;
+import com.hywx.sirs.global.GlobalConstant;
 import com.hywx.sirs.global.GlobalQueue;
 import com.hywx.sirs.net.ExchangeClient;
 import com.hywx.sirs.net.ExchangeServer;
@@ -23,7 +22,6 @@ import com.hywx.sirs.net.SimuReceiver;
 import com.hywx.sirs.net.SimuSender;
 import com.hywx.sirs.util.ByteUtil;
 import com.hywx.sirs.util.FileUtil;
-import com.hywx.sirs.vo.StationVO;
 
 @Service
 public class ThreadService {
@@ -88,9 +86,13 @@ public class ThreadService {
 	        	
 	        	byte[] data = GlobalQueue.getSimuQueue().take();
         		long bid = ByteUtil.toUInt(data, 11, false);
+        		//MID, 2字节16进制
+        		int mid = ByteUtil.toUShort(data, 1, false);
         		//SID, 4字节16进制
         		String sid = String.format("%08X", ByteUtil.toUInt(data, 3, false));
-        		//System.out.println("*******************statiod bid, sid: *********" + Long.toHexString(bid) + ", " + sid);
+        		//if (bid == GlobalConstant.BID_TM)
+        		//    System.out.println("*******************statiod bid, mid, sid: *********" + Long.toHexString(bid) + ", " + Long.toHexString(mid) + ", " + sid);
+        		
         		
         		AbstractBidOperation bidOperation = BidOperationFactory.getInstance(bid);
         		if (bidOperation != null) {

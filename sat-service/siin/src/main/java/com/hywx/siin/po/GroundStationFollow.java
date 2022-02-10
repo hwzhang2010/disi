@@ -19,7 +19,7 @@ public class GroundStationFollow {
 		SimpleDateFormat format = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(epoch);   
-        cal.add(Calendar.HOUR, 8);
+        //cal.add(Calendar.HOUR, 8);
 		this.epoch = format.format(cal.getTime());
 		
 		this.azimuth = new BigDecimal(azimuth).setScale(2, RoundingMode.UP).doubleValue();

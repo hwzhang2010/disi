@@ -1,6 +1,9 @@
 package com.hywx.sisl.global;
 
 public class GlobalConstant {
+	// 地球自转角速度
+	public static final double WZ = 7.2921151467e-5;
+	
 	// 帧头字节长度
 	public static final int FRAME_HEADER_LENGTH = 32;
 	
@@ -18,11 +21,11 @@ public class GlobalConstant {
 	
 	
     // BID, 测距测速
-	public static long BID_RANGE = 0x00000076;
-	//public static long bidOfRange = 0x00007600;
+	//public static long BID_RANGE = 0x00000076;
+	public static long BID_RANGE = 0x00007600;
     // BID, 测角
-	public static long BID_ANGLE = 0x0000007E;
-	//public static long bidOfAngle = 0x00007E00;
+	//public static long BID_ANGLE = 0x0000007E;
+	public static long BID_ANGLE = 0x00007E00;
 	// BID, 轨道根数
 	public static long BID_ORBIT_ELEM = 0x00200004;
 	// BID, GPS

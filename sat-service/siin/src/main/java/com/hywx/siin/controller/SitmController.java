@@ -15,6 +15,8 @@ import com.hywx.siin.common.Resp;
 import com.hywx.siin.po.TmRsltFrame;
 import com.hywx.siin.service.SatelliteService;
 import com.hywx.siin.service.TmService;
+import com.hywx.sitm.vo.SitmGroundStationFaultVO;
+import com.hywx.sitm.vo.SitmSatelliteFaultVO;
 import com.hywx.sitm.vo.SitmSatelliteRunningVO;
 import com.hywx.sitm.vo.SitmSatelliteVO;
 import com.hywx.sitm.vo.TmRsltFrameVO;
@@ -116,9 +118,6 @@ public class SitmController {
 		
 	    //JSONArray -> List
 		List<String> satelliteIdList = JSONObject.parseArray(param.getJSONArray("satelliteIdList").toJSONString(), String.class);
-		for (String string : satelliteIdList) {
-			System.out.println("***********" + string);
-		}
 		
 		tmService.updateSatelliteRunBatch(satelliteIdList, sendType);
 	
@@ -244,6 +243,82 @@ public class SitmController {
 	}
 	
 	@CrossOrigin  //跨域访问
+	@RequestMapping(value = "api/v1/sitm/groundstation/autosend/current", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+	public Resp getSitmGroundStationAutoSend(@RequestBody JSONObject param) {
+		System.out.println("sitm groundstation autosend current param:" + param);
+		String satelliteId = param.getString("satelliteId");
+		
+		String groundStationId = tmService.getGroundStationOfAutoSend(satelliteId);
+        
+        return Resp.getInstantiationSuccessString("sitm groundstation autosend current", groundStationId);
+	}
+	
+	@CrossOrigin  //跨域访问
+	@RequestMapping(value = "api/v1/sitm/groundstation/autosend", method = RequestMethod.PUT, consumes = "application/json", produces = "application/json")
+	public Resp updateSitmGroundStationAutoSend(@RequestBody JSONObject param) {
+		System.out.println("sitm groundstation autosend param:" + param);
+		String satelliteId = param.getString("satelliteId");
+		String groundStationId = param.getString("groundStationId");
+		
+		tmService.updateGroundStationOfAutoSend(satelliteId, groundStationId);
+        
+        return Resp.getInstantiationSuccessString("sitm groundstation autosend", groundStationId);
+	}
+	
+	@CrossOrigin  //跨域访问
+	@RequestMapping(value = "api/v1/sitm/fault/satellites", method = RequestMethod.PUT, consumes = "application/json", produces = "application/json")
+	public Resp udpateSitmSatelliteFault(@RequestBody JSONObject param) {
+		System.out.println("sitm fault satellite param:" + param);
+		
+	    //JSONArray -> List
+		List<String> satelliteIdList = JSONObject.parseArray(param.getJSONArray("satelliteIdList").toJSONString(), String.class);
+		for (String string : satelliteIdList) {
+			System.out.println("***********" + string);
+		}
+		
+		tmService.updateSatelliteFault(satelliteIdList);
+	
+		return Resp.getInstantiationSuccessString("sitm fault satellite success", null);
+	}
+	
+	@CrossOrigin  //跨域访问
+	@RequestMapping(value = "api/v1/sitm/fault/groundstations", method = RequestMethod.PUT, consumes = "application/json", produces = "application/json")
+	public Resp udpateSitmGroundStationFault(@RequestBody JSONObject param) {
+		System.out.println("sitm fault groundstation param:" + param);
+		
+	    //JSONArray -> List
+		List<String> groundStationIdList = JSONObject.parseArray(param.getJSONArray("groundStationIdList").toJSONString(), String.class);
+		for (String string : groundStationIdList) {
+			System.out.println("***********" + string);
+		}
+		
+		tmService.updateGroundStationFault(groundStationIdList);
+	
+		return Resp.getInstantiationSuccessString("sitm fault groundstation success", null);
+	}
+	
+	@CrossOrigin  //跨域访问
+	@RequestMapping(value = "api/v1/sitm/faulting/satellites", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+	public Resp listSitmSatelliteFaulting(@RequestBody JSONObject param) {
+		System.out.println("sitm faulting satellite param:" + param);
+		
+		SitmSatelliteFaultVO vo = tmService.getSatelliteFaulting();
+	
+		return Resp.getInstantiationSuccessString("sitm faulting satellite success", vo);
+	}
+	
+	@CrossOrigin  //跨域访问
+	@RequestMapping(value = "api/v1/sitm/faulting/groundstations", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+	public Resp listSitmGroundStationFaulting(@RequestBody JSONObject param) {
+		System.out.println("sitm faulting groundstation param:" + param);
+		
+		SitmGroundStationFaultVO vo = tmService.getGroundStationFaulting();
+	
+		return Resp.getInstantiationSuccessString("sitm faulting groundstation success", vo);
+	}
+	
+	
+	@CrossOrigin  //跨域访问
 	@RequestMapping(value = "api/v1/sitm/rslt/list/page", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
 	public Resp listSitmRstlFrame(@RequestBody JSONObject param) {
 		System.out.println("sitm rslt frame list page param:" + param);
@@ -263,8 +338,8 @@ public class SitmController {
 	
 	@CrossOrigin  //跨域访问
 	@RequestMapping(value = "api/v1/sitm/rslt/insert", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
-	public Resp insertSitmRstlFrame(@RequestBody JSONObject param) {
-		System.out.println("sitm rslt frame insert param:" + param);
+	public Resp insertSitmRslt(@RequestBody JSONObject param) {
+		System.out.println("sitm rslt insert param:" + param);
 		String satelliteId = param.getString("satelliteId");
 		TmRsltFrame rslt = param.getObject("rslt", TmRsltFrame.class);
 		
@@ -277,13 +352,13 @@ public class SitmController {
 		
 		int result = tmService.insertTmRslt(satelliteId, rslt);
 		 
-        return Resp.getInstantiationSuccessString("sitm rslt frame insert", result);
+        return Resp.getInstantiationSuccessString("sitm rslt insert", result);
 	}
 	
 	@CrossOrigin  //跨域访问
 	@RequestMapping(value = "api/v1/sitm/rslt/delete", method = RequestMethod.DELETE, consumes = "application/json", produces = "application/json")
-	public Resp deleteSitmRstlFrame(@RequestBody JSONObject param) {
-		System.out.println("sitm rslt frame delete param:" + param);
+	public Resp deleteSitmRstl(@RequestBody JSONObject param) {
+		System.out.println("sitm rslt delete param:" + param);
 		String satelliteId = param.getString("satelliteId");
 		int id = param.getIntValue("id");
 		
@@ -296,13 +371,13 @@ public class SitmController {
 		
 		int result = tmService.deleteTmRslt2(satelliteId, id);
 		 
-        return Resp.getInstantiationSuccessString("sitm rslt frame delete", result);
+        return Resp.getInstantiationSuccessString("sitm rslt delete", result);
 	}
 	
 	@CrossOrigin  //跨域访问
 	@RequestMapping(value = "api/v1/sitm/rslt/update", method = RequestMethod.PUT, consumes = "application/json", produces = "application/json")
 	public Resp updateSitmRstlFrame(@RequestBody JSONObject param) {
-		System.out.println("sitm rslt frame update param:" + param);
+		System.out.println("sitm rslt update param:" + param);
 		String satelliteId = param.getString("satelliteId");
 		TmRsltFrame rslt = param.getObject("row", TmRsltFrame.class);
 		
@@ -315,8 +390,50 @@ public class SitmController {
 		
 		int result = tmService.updateTmRslt(satelliteId, rslt);
 		 
-        return Resp.getInstantiationSuccessString("sitm rslt frame update", result);
+        return Resp.getInstantiationSuccessString("sitm rslt update", result);
 	}
+	
+	@CrossOrigin  //跨域访问
+	@RequestMapping(value = "api/v1/sitm/rslt/frame/insert", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+	public Resp insertSitmRsltFrame(@RequestBody JSONObject param) {
+		System.out.println("sitm rslt frame insert param:" + param);
+		String satelliteId = param.getString("satelliteId");
+		
+		if (!satelliteService.existSatellite(satelliteId)) {
+			return Resp.getInstantiationErrorString(String.format("卫星ID%s不存在", satelliteId), "false");
+		}
+		if (tmService.existTmRsltTable2(satelliteId) > 0) {
+			return Resp.getInstantiationErrorString(String.format("卫星ID%s的遥测参数表已存在", satelliteId), "false");
+		}
+		
+		int result = tmService.createTmRsltFrame2(satelliteId);
+		 
+        return Resp.getInstantiationSuccessString("sitm rslt frame insert", result);
+	}
+	
+	@CrossOrigin  //跨域访问
+	@RequestMapping(value = "api/v1/sitm/rslt/frame/drop", method = RequestMethod.DELETE, consumes = "application/json", produces = "application/json")
+	public Resp deleteSitmRsltFrame(@RequestBody JSONObject param) {
+		System.out.println("sitm rslt frame delete param:" + param);
+		String satelliteId = param.getString("satelliteId");
+		
+		if (!satelliteService.existSatellite(satelliteId)) {
+			return Resp.getInstantiationErrorString(String.format("卫星ID%s不存在", satelliteId), "false");
+		}
+		if (tmService.existTmRsltTable2(satelliteId) < 1) {
+			return Resp.getInstantiationErrorString(String.format("卫星ID%s的遥测参数表不存在", satelliteId), "false");
+		}
+		
+		int result = tmService.dropTmRsltFrame2(satelliteId);
+		 
+        return Resp.getInstantiationSuccessString("sitm rslt frame delete", result);
+	}
+	
+	
+	
+	
+	
+	
 	
 	
 

@@ -10,6 +10,8 @@ import org.apache.ibatis.annotations.Update;
 
 import com.hywx.siin.common.Page;
 import com.hywx.siin.po.TmRsltFrame;
+import com.hywx.sitm.vo.SitmGroundStationFaultVO;
+import com.hywx.sitm.vo.SitmSatelliteFaultVO;
 import com.hywx.sitm.vo.SitmSatelliteRunningVO;
 import com.hywx.sitm.vo.SitmSatelliteVO;
 import com.hywx.sitm.vo.TmRsltFrameVO;
@@ -20,9 +22,33 @@ public interface TmService {
     @Select("SELECT CODENAME as codeName, NAME as name, ID as id, SRCTYPE as srcType, RSLTTYPE as rsltType, BD as bd, BITRANGE as bitRange, BYTEORDER as byteOrder, COEFFICIENT as coefficient, ALGORITHM as algorithm, RANGE as range, PRECONDITION as preCondition, VALIDFRAMECNT as validFrameCnt, FRAMEID as frameId, SUBSYSTEMID as subsystemId, OBJID as objId FROM ${tableName} ")
     List<TmRsltFrame> listTmRsltFrames(@Param("tableName") String tableName);
     
-    // 查询表是否存在
-    @Select("SELECT count(*) FROM sqlite_master WHERE type='table' AND name = #{tableName}")
-    int existTmRsltTable(@Param("tableName") String tableName);
+ // 查询表是否存在
+    @Select("SELECT count(*) FROM sqlite_master WHERE type='table' AND TBL_NAME = '${tableName}' ")
+    int existTmRsltFrame(@Param("tableName") String tableName);
+    
+    // 删除表语句
+    @Update("DROP TABLE ${tableName}")
+    int dropTmRsltFrame(@Param("tableName") String tableName);
+    
+    // 创建表语句
+    @Update("create table ${tableName}( CODENAME VARCHAR(100)  NOT NULL, " +
+            " NAME VARCHAR(200) NOT NULL, " +
+            " ID INTEGER NOT NULL, " +
+            " SRCTYPE VARCHAR(10), " + 
+            " RSLTTYPE VARCHAR(10), " +
+            " BD VARCHAR(100), " +
+            " BITRANGE VARCHAR(20), " +
+            " BYTEORDER INTEGER, " +
+            " COEFFICIENT CLOB, " +
+            " ALGORITHM VARCHAR(500), " +
+            " RANGE VARCHAR(200), " +
+            " PRECONDITION VARCHAR(200), " +
+            " VALIDFRAMECNT VARCHAR(100), " +
+            " FRAMEID INTEGER NOT NULL, " +
+            " SUBSYSTEMID INTEGER NOT NULL, " +
+            " OBJID INTEGER NOT NULL, " +
+            " PRIMARY KEY ( ID, FRAMEID, OBJID )  )")
+    int createTmRsltFrame(@Param("tableName") String tableName);
     
     // 插入1条遥测参数
  	@Insert("INSERT INTO ${tableName}(CODENAME, NAME, ID, SRCTYPE, RSLTTYPE, BD, BITRANGE, BYTEORDER, COEFFICIENT, ALGORITHM, RANGE, PRECONDITION, VALIDFRAMECNT, FRAMEID, SUBSYSTEMID, OBJID) VALUES(#{codeName}, #{name}, #{id}, #{srcType}, #{rsltType}, #{bd}, #{bitRange}, #{byteOrder}, #{coefficient}, #{algorithm}, #{range}, #{preCondition}, #{validFrameCnt}, #{frameId}, #{subsystemId}, #{objId})")
@@ -37,6 +63,10 @@ public interface TmService {
     int updateTmRslt(@Param("tableName") String tableName, @Param("codeName") String codeName, @Param("name") String name, @Param("srcType") String srcType, @Param("rsltType") String rsltType, @Param("bd") String bd, @Param("bitRange") String bitRange, @Param("byteOrder") int byteOrder , @Param("coefficient") String coefficient, @Param("algorithm") String algorithm, @Param("range") String range, @Param("preCondition") String preCondition, @Param("validFrameCnt") String validFrameCnt, @Param("frameId") int frameId, @Param("subsystemId") int subsystemId, @Param("objId") int objId, @Param("id") int id);
  	
  	int existTmRsltTable2(String satelliteId);
+ 	
+ 	int dropTmRsltFrame2(String satelliteId);
+ 	
+ 	int createTmRsltFrame2(String satelliteId);
  	
  	int insertTmRslt(String satelliteId, TmRsltFrame rslt);
  	
@@ -88,5 +118,23 @@ public interface TmService {
 	
 	// 遥测仿真发送计数置0
 	void updateSatelliteSendCountZero(String satelliteId);
+	
+	// 获取遥测仿真自动发送的信关站
+	String getGroundStationOfAutoSend(String satelliteId);
+	
+	// 更新遥测仿真自动发送的信关站
+	void updateGroundStationOfAutoSend(String satelliteId, String groundStationId);
+	
+	// 更新遥测仿真数据故障的卫星
+	void updateSatelliteFault(List<String> satelliteIdList);
+	
+	// 更新故障的信关站
+	void updateGroundStationFault(List<String> groundStationIdList);
+	
+	// 返回已经设置了的故障卫星
+	SitmSatelliteFaultVO getSatelliteFaulting();
+	
+	// 返回已经设置了的故障信关站
+	SitmGroundStationFaultVO getGroundStationFaulting();
 	
 }

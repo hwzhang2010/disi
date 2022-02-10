@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Select;
 
 import com.hywx.sitm.po.GpsFrame;
 import com.hywx.sitm.po.Satellite;
+import com.hywx.sitm.po.SatelliteTle;
 
 public interface SatelliteService {
 	// 查询所有卫星描述信息
@@ -17,6 +18,10 @@ public interface SatelliteService {
 	// 查询所有卫星ID
 	@Select("SELECT SATELLITEID FROM T_SATELLITE WHERE ISUSED = 1")
 	List<String> listSatelliteIds();
+	
+	// 根据卫星ID查询两行根数
+	@Select("SELECT SATELLITEID, TLELINE0 as tleLine0, TLELINE1 as tleLine1, TLELINE2 as tleLine2 FROM T_SATELLITE_TLE WHERE SATELLITEID = #{satelliteId}")
+	SatelliteTle getSatelliteTle(String satelliteId);
 	
 	// 批量插入GPS数据
 	@Insert({

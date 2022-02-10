@@ -34,7 +34,7 @@ public class SitmApplication implements ApplicationRunner {
 		if (groupList == null || groupList.isEmpty()) {
 		    System.out.println("************卫星分组参数未配置, 应用程序退出.************");
 		    return;
-		} else{
+		} else {
 			System.out.println("************卫星分组参数: --group=" + groupList.get(0));
 			//阻塞主线程
 			Thread.currentThread().join();

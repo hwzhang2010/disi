@@ -22,11 +22,14 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.hywx.sisn.bo.rc.RemoteCommand;
 import com.hywx.sisn.bo.rc.RemoteCommandBack;
+import com.hywx.sisn.bo.stationnet.SendToStationPlan;
+import com.hywx.sisn.bo.stationnet.WeekPlanEcho;
 import com.hywx.sisn.config.FileConfig;
 import com.hywx.sisn.config.MyConfig;
 import com.hywx.sisn.global.GlobalConstant;
 import com.hywx.sisn.global.GlobalQueue;
 import com.hywx.sisn.net.SisnSender;
+import com.hywx.sisn.po.StationNetReply;
 import com.hywx.sisn.struct.JavaStruct;
 import com.hywx.sisn.struct.StructException;
 import com.hywx.sisn.struct.data.BhHead;
@@ -49,6 +52,8 @@ public class ThreadService {
 	private FileConfig fileConfig;
 	@Autowired
 	private MyConfig myConfig;
+	@Autowired
+	private StationNetService stationNetService;
     
 	/**
 	 * UDP组播接收
@@ -114,6 +119,7 @@ public class ThreadService {
 	        	
 	        	//System.out.println("----------did, bid: " + String.format("%08X, %08X", did, bid));
 	        	
+	        	
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	        }
@@ -128,14 +134,17 @@ public class ThreadService {
 	private void judgeAndProcess(long bid, byte[] data) {
 		
 		//判断BID
-		if (bid == GlobalConstant.BID_RC) {  //外测提供的GPS数据，以此作为遥测源码发送的驱动。	
-		    processRemoteCommand(data);
-		} else {
+		if (bid == GlobalConstant.BID_RC) {  //远控命令	
+			processRemoteCommand(data);
+		} else if (bid == GlobalConstant.BID_STATIONNET_PLAN) {  //站网计划
+			processStationNetPlan(data); 
+		//} else if (bid == GlobalConstant.BID_STATIONNET_STATE)  {  //站网状态 	
+	    } else {
 		}
 		
 	}
 	
-	
+
 	/**
      * 远控指令
      * @param data
@@ -148,6 +157,9 @@ public class ThreadService {
 		
 		if (data.length < GlobalConstant.FRAME_HEADER_LENGTH)
 			return;
+		
+		String reply = stationNetService.getStationNetReplyById();
+		StationNetReply stationNetReply = stationNetService.getStationNetReply(reply);
 		
 		byte[] header = new byte[GlobalConstant.FRAME_HEADER_LENGTH];
         byte[] body = new byte[GlobalConstant.FRAME_RC_LENGTH];
@@ -193,9 +205,10 @@ public class ThreadService {
 			
 			
 			//int reply = new Random().nextInt(2) + 1;
-            
-            RemoteCommandBack remoteCommandBack2 = new RemoteCommandBack(remoteCommand.getId(), remoteCommand.getStationId(), remoteCommand.getEquipId(), remoteCommand.getCommandType(), "OK", "");
-            String remoteCommandBackJson2 = JSON.toJSONString(remoteCommandBack2);
+            // NOK, equipment failure
+            // RemoteCommandBack remoteCommandBack2 = new RemoteCommandBack(remoteCommand.getId(), remoteCommand.getStationId(), remoteCommand.getEquipId(), remoteCommand.getCommandType(), "OK", "");
+			RemoteCommandBack remoteCommandBack2 = new RemoteCommandBack(remoteCommand.getId(), remoteCommand.getStationId(), remoteCommand.getEquipId(), remoteCommand.getCommandType(), stationNetReply.getReply(), stationNetReply.getReason());
+			String remoteCommandBackJson2 = JSON.toJSONString(remoteCommandBack2);
             byte[] back2 = StringUtils.string2byte(remoteCommandBackJson2);
             //有效字节长度
             int length2 = back2.length;
@@ -215,18 +228,98 @@ public class ThreadService {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}
-        
-		
-		
-		
-		
-			
-		
+		}	
 		
 	}
 
-	
+	/**
+	 * 站网计划
+	 * @param data
+	 */
+	private void processStationNetPlan(byte[] data) {
+		//信息处理标识, 自己发送的固定填写0x7E, 避免UDP组播收到自己发送的后进行处理.
+		byte flag = data[19];
+		if (flag == 0x7E)
+			return;
+		
+		if (data.length < GlobalConstant.FRAME_HEADER_LENGTH)
+			return;
+		
+		String reply = stationNetService.getStationNetReplyById();
+		StationNetReply stationNetReply = stationNetService.getStationNetReply(reply);
+		
+		byte[] header = new byte[GlobalConstant.FRAME_HEADER_LENGTH];
+        byte[] body = new byte[GlobalConstant.FRAME_STATIONNET_PLAN_LENGTH];
+        System.arraycopy(data, 0, header, 0, GlobalConstant.FRAME_HEADER_LENGTH);
+        System.arraycopy(data, GlobalConstant.FRAME_HEADER_LENGTH, body, 0, data.length - GlobalConstant.FRAME_HEADER_LENGTH);
+        
+        //信息处理标识，固定填写0x7E
+        header[19] = 0x7E;
+        //把DID放到SID的位置, 把DID置为0
+        header[3] = header[7];
+        header[4] = header[8];
+        header[5] = header[9];
+        header[6] = header[10];
+        header[7] = 0x0;
+        header[8] = 0x0;
+        header[9] = 0x0;
+        header[10] = 0x0;
+        
+		try {
+			String msg = new String(body, "utf-8");
+			
+			System.out.println("----" + data.length + ", " + msg.length() + ", " + msg);
+			
+			SendToStationPlan plan = JSON.parseObject(msg, SendToStationPlan.class);
+            //BhHead bhHead = new BhHead();
+            //JavaStruct.unpack(bhHead, header, ByteOrder.LITTLE_ENDIAN);
+            //System.out.println("*******************" + ByteUtil.toHex(JavaStruct.pack(bhHead, ByteOrder.LITTLE_ENDIAN)));
+            
+			WeekPlanEcho echo = new WeekPlanEcho(plan.getTrackId(), plan.getStationId(), "ECH", "", plan.getPlanType());
+            String echoJson = JSON.toJSONString(echo);
+            byte[] back = StringUtils.string2byte(echoJson);
+            //有效字节长度
+            int length = back.length;
+            header[30] = (byte) (length & 0xFF);
+            header[31] = (byte) ((length >> 8) & 0xFF);
+            
+            ByteBuffer backBuffer = ByteBuffer.allocate(GlobalConstant.FRAME_HEADER_LENGTH + length);
+            backBuffer.put(header);
+            backBuffer.put(back);
+            
+            Thread.sleep(2000);
+            
+            //把生成的应答放入UDP组播发送队列
+			GlobalQueue.getSendQueue().put(backBuffer);
+			
+			
+			//int reply = new Random().nextInt(2) + 1;
+            
+			//WeekPlanEcho echo2 = new WeekPlanEcho(plan.getTrackId(), plan.getStationId(), "OK", "", plan.getPlanType());
+			WeekPlanEcho echo2 = new WeekPlanEcho(plan.getTrackId(), plan.getStationId(), stationNetReply.getReply(), stationNetReply.getReason(), plan.getPlanType());
+			String echoJson2 = JSON.toJSONString(echo2);
+            byte[] back2 = StringUtils.string2byte(echoJson2);
+            //有效字节长度
+            int length2 = back2.length;
+            header[30] = (byte) (length2 & 0xFF);
+            header[31] = (byte) ((length2 >> 8) & 0xFF);
+            
+            ByteBuffer backBuffer2 = ByteBuffer.allocate(GlobalConstant.FRAME_HEADER_LENGTH + length2);
+            backBuffer2.put(header);
+            backBuffer2.put(back2);
+            
+            Thread.sleep(2000);
+            
+            //把生成的应答放入UDP组播发送队列
+			GlobalQueue.getSendQueue().put(backBuffer2);
+			
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}	
+		
+	}
 	
 	
 	

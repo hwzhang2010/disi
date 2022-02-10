@@ -32,15 +32,14 @@ public class GroundStationPass {
 		SimpleDateFormat format = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
 		
 		Calendar cal = Calendar.getInstance();   
-		
 		Date startTime = satPassTime.getStartTime();
 		cal.setTime(startTime);   
-        cal.add(Calendar.HOUR, 8);
+        //cal.add(Calendar.HOUR, 8);
 		this.startTime = format.format(cal.getTime());
 		
 		Date endTime = satPassTime.getEndTime();
 		cal.setTime(endTime);
-		cal.add(Calendar.HOUR, 8);
+		//cal.add(Calendar.HOUR, 8);
 		this.endTime = format.format(cal.getTime());
 		
 		double duration = (endTime.getTime() - startTime.getTime()) / 60000.0;

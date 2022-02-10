@@ -7,8 +7,11 @@ import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSONObject;
 import com.hywx.sitm.bo.SitmSave;
 import com.hywx.sitm.bo.SitmType;
+import com.hywx.sitm.bo.TlePredictionFactory;
 import com.hywx.sitm.bo.SitmCmd;
 import com.hywx.sitm.bo.SitmGpsFromExternal;
 import com.hywx.sitm.bo.gps.AbstractSitmGps;
@@ -31,11 +35,14 @@ import com.hywx.sitm.global.GlobalAccess;
 import com.hywx.sitm.global.GlobalConstant;
 import com.hywx.sitm.global.GlobalQueue;
 import com.hywx.sitm.net.SitmSender;
+import com.hywx.sitm.orbit.tle.prediction.Sgp4;
+import com.hywx.sitm.orbit.tle.prediction.Tle;
 import com.hywx.sitm.po.GpsFrame;
 import com.hywx.sitm.net.SitmReceiver;
 import com.hywx.sitm.redis.RedisFind;
 import com.hywx.sitm.util.ByteUtil;
 import com.hywx.sitm.util.FileUtil;
+import com.hywx.sitm.vo.TmRsltFrameVO;
 
 /**
  * 创建多线程任务
@@ -138,7 +145,7 @@ public class ThreadService {
 		
 		//判断BID
 		if (bid == GlobalConstant.BID_GPS) {  //外测提供的GPS数据，以此作为遥测源码发送的驱动。	
-		    processExternalWithGps(mid, data);
+		    //processExternalWithGps(mid, data);
 		} else if (bid == GlobalConstant.BID_TC) {  //遥控
 			processTc(data);
 		} else if (bid == GlobalConstant.BID_INJECTION) {  //注入
@@ -193,7 +200,9 @@ public class ThreadService {
 			SitmGpsFromExternal sitmGpsFromExternal = new SitmGpsFromExternal(header, gpsFrame);
 			
 			GlobalAccess.putSitmGpsFromExternal(satelliteId, sitmGpsFromExternal);
+			//GlobalAccess.putSitmGpsArrived(satelliteId, true);
 		}
+		
 		
 	}
 
@@ -214,8 +223,9 @@ public class ThreadService {
 		long timeStamp = ByteUtil.toLong(data, 80, myConfig.isNet());
 		
 		// 将timestamp转为LocalDateTime
-		Instant instant = Instant.ofEpochMilli(timeStamp);
-		LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+		//Instant instant = Instant.ofEpochMilli(timeStamp);
+		//LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+		LocalDateTime localDateTime = LocalDateTime.ofEpochSecond(timeStamp / 1000, 0, ZoneOffset.ofHours(8));
 		
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm:ss.SSS");
 		String time = formatter.format(localDateTime);
@@ -258,9 +268,12 @@ public class ThreadService {
 		    //添加到对应卫星ID的redis中
 			String cmdKey = RedisFind.keyBuilder("tm", "cmd", satelliteId);
 			redisTemplate.opsForValue().set(cmdKey, sitmCmd);
-		
-			//添加到存储队列，提供给数据存储使用
-			//GlobalQueue.getSaveQueue().put(new SitmSave(SitmType.CMD, data));
+			
+			//updateFrame4Tc(satelliteId, sitmCmd);
+			System.out.println("****satelliteId:" + satelliteId);
+			
+			
+			
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}	
@@ -287,8 +300,11 @@ public class ThreadService {
 		    String cmdFlagKey = RedisFind.keyBuilder("tm", "cmdflag", satelliteId);
 		    redisTemplate.opsForValue().increment(cmdFlagKey, 2);
 		
-			//添加到存储队列，提供给数据存储使用
-			//GlobalQueue.getSaveQueue().put(new SitmSave(SitmType.INJECTION, data));
+			//updateFrame4Injection(satelliteId);
+			
+			
+			
+			
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}	
@@ -325,73 +341,14 @@ public class ThreadService {
 				ByteBuffer buffer = GlobalQueue.getSendQueue().take();
 				
 				sitmSend.send(buffer.array());
-				
 				//挂起1ms, 节省CPU
-				Thread.sleep(1);
+				//Thread.sleep(1);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			
 		}
 	}
-	
-//	/**
-//	 * 监测外测驱动
-//	 */
-//	@Async  //标注为异步任务，在执行时会单独开启线程来执行
-//	public void executeDrive() {
-//		while (true) {
-//			
-//			try {
-//				if (GlobalQueue.getDriveQueue().isEmpty()) {  //当没有外测数据的时候
-//					//当前时刻的时间戳，秒
-//					long now = LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8"));
-//					String driveKey = RedisFind.keyBuilder("tm", "sign", "drive");
-//					if (redisTemplate.hasKey(driveKey)) {
-//						//得到外测驱动的所有卫星ID
-//						Set<Object> satelliteSet = redisTemplate.opsForHash().keys(driveKey);
-//						for (Object obj : satelliteSet) {
-//							if (obj instanceof String) {
-//								String satelliteId = (String) obj;
-//								long last = (long) redisTemplate.opsForHash().get(driveKey, satelliteId);
-//								//超过过期时间，删除卫星ID
-//								if (now - last > EXPIRE_TIME)
-//									redisTemplate.opsForHash().delete(driveKey, satelliteId);
-//							}
-//						}
-//					}
-//					
-//					//挂起1ms，节省CPU
-//					Thread.sleep(1);
-//				} else {  //接收到了外测数据的时候
-//					//提取组播接收队列的数据
-//					byte[] data = GlobalQueue.getDriveQueue().take(); 
-//		
-//					//得到接收数据的卫星ID
-//					String satelliteId = String.format("%04X", ByteUtil.toUShort(data, 1, myConfig.isNet()));
-//					//外测驱动的卫星ID
-//					String extKey = RedisFind.keyBuilder("tm", "sign", "ext");
-//					if (redisTemplate.opsForSet().isMember(extKey, satelliteId)) {
-//						//得到接收数据的PDXP帧头
-//						byte[] header = Arrays.copyOf(data, FRAME_HEADER_LENGTH); 
-//						
-//						//把外测驱动的数据写入Redis, 并设置过期时间10s
-//						String externalKey = RedisFind.keyBuilder("tm", "external", satelliteId);
-//						redisTemplate.opsForValue().set(externalKey, header, EXPIRE_TIME, TimeUnit.SECONDS);;
-//						
-//						//把外测驱动的数据卫星ID写入Redis
-//						String driveKey = RedisFind.keyBuilder("tm", "sign", "drive");
-//						//当前时刻的时间戳，秒
-//						long stamp = LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8"));
-//						//把卫星ID和当前时间戳作为HashMap写入Redis
-//						redisTemplate.opsForHash().put(driveKey, satelliteId, stamp);
-//					}
-//				}
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//	}
 	
 	
 	/**
@@ -426,6 +383,235 @@ public class ThreadService {
 		
 		return local;
 	}
+	
+	
+	
+	private void updateFrame4Tc(String satelliteId, SitmCmd cmd) {
+		//如果接收到遥控发令，则对遥控指令关联的遥测参数进行更新，以便下次遥测响应
+		//String cmdKey = RedisFind.keyBuilder("tm", "cmd", satelliteId);
+		//SitmCmd cmd = (SitmCmd) redisTemplate.opsForValue().get(cmdKey);
+		
+		String rawKey = RedisFind.keyBuilder("tm", "raw", satelliteId);
+		long size = redisTemplate.opsForList().size(rawKey);
+		for (int index = 0; index < size; index++) {
+			TmRsltFrameVO vo = (TmRsltFrameVO) redisTemplate.opsForList().index(rawKey, index);
+			//对象深拷贝
+			//TmRsltFrameVO copyVO = vo.clone();
+			//源码参数ID
+			int id = vo.getId();
+			//源码参数代号
+			//String codeName = vo.getCodeName();
+			//源码参数起始波道
+			//int bd = vo.getBd();
+			//源码参数值
+			String value = vo.getValue();
+			//源码参数数据类型
+			String srcType = vo.getSrcType();
+			//源码参数仿真类型
+			//String paramType = vo.getParamType();
+			//源码参数系数
+			//double coefficient = vo.getCoefficient();
+			
+			//仿真参数
+			SitmParam param = null;
+			//根据参数ID进行遥控发令关联的处理
+			if (id == 1) {  //第0个遥测参数: 遥控指令计数 + 1
+				param = SitmTypeFactory.getInstance(srcType)
+                                       .getSitmParam(value, "increment", 1);
+				vo.setParamType("cmd");
+				vo.setCoefficient(1);
+				vo.setValue(param.getValue());
+				
+				redisTemplate.opsForList().set(rawKey, index, vo);
+			} else if (id == cmd.getId()) {  //第1 - 14个遥测参数，分 奇数，偶数与遥控指令对应
+				param = SitmTypeFactory.getInstance(srcType)
+                                       .getSitmParam(cmd.getValue(), "cmd", 1);
+				//设置为遥控指令参数
+		        vo.setParamType("cmd");
+		        vo.setCoefficient(1);
+		        vo.setValue(param.getValue());
+		        
+		        redisTemplate.opsForList().set(rawKey, index, vo);
+			} else {
+			}
+		}
+		
+	}
+	
+	
+	private void updateFrame4Injection(String satelliteId) {
+		String rawKey = RedisFind.keyBuilder("tm", "raw", satelliteId);
+		long size = redisTemplate.opsForList().size(rawKey);
+		for (int index = 0; index < size; index++) {
+			TmRsltFrameVO vo = (TmRsltFrameVO) redisTemplate.opsForList().index(rawKey, index);
+			//对象深拷贝
+			//TmRsltFrameVO copyVO = vo.clone();
+			//源码参数ID
+			int id = vo.getId();
+			//源码参数代号
+			//String codeName = vo.getCodeName();
+			//源码参数起始波道
+			//int bd = vo.getBd();
+			//源码参数值
+			String value = vo.getValue();
+			//源码参数数据类型
+			String srcType = vo.getSrcType();
+			//源码参数仿真类型
+			//String paramType = vo.getParamType();
+			//源码参数系数
+			//double coefficient = vo.getCoefficient();
+			
+			//仿真参数
+			SitmParam param = null;
+			//根据参数ID进行遥控发令关联的处理
+			if (id == 1) {  //第0个遥测参数: 遥控指令计数 + 1
+				param = SitmTypeFactory.getInstance(srcType)
+                                       .getSitmParam(value, "increment", 1);
+				vo.setParamType("cmd");
+				vo.setCoefficient(1);
+				//更新源码参数的值，并写入Redis
+			    vo.setValue(param.getValue());
+			    
+			    redisTemplate.opsForList().set(rawKey, index, vo);
+			}
+		}
+	}
+	
+	/**
+	 * 根据卫星ID填充卫星遥测源码数据
+	 * @param satelliteId
+	 * @return
+	 */
+	private byte[] produceFrameData(String satelliteId) {
+//		long timeStamp = 0;
+//		// 从redis中取出计算的时间，以时间戳的形式
+//		String timeStampKey = RedisFind.keyBuilder("sisl", "datetime", "timestamp", "");
+//        if (redisTemplate.hasKey(timeStampKey)) {
+//            timeStamp = (long) redisTemplate.opsForValue().get(timeStampKey);
+//        }
+		
+		// GPS的卫星位置和速度
+		Date current = new Date();
+		long timeStamp = current.getTime();
+		Tle tle = TlePredictionFactory.getTle(satelliteId);
+		double[][] rv = tle.getRV(current);
+		double[][] rvECEF = fromECItoECEF(timeStamp, rv);
+		
+		GpsFrame gpsFrame = new GpsFrame(LocalDateTime.ofEpochSecond(timeStamp / 1000, 0, ZoneOffset.ofHours(8)));
+		gpsFrame.setSx(rvECEF[0][0] * 1000);
+		gpsFrame.setSy(rvECEF[0][1] * 1000);
+		gpsFrame.setSz(rvECEF[0][2] * 1000);
+		gpsFrame.setVx(rvECEF[1][0] * 1000);
+		gpsFrame.setVy(rvECEF[1][1] * 1000);
+		gpsFrame.setVz(rvECEF[1][2] * 1000);
+		
+		byte[] data = new byte[GlobalConstant.FRAME_TM_LENGTH];
+		String rawKey = RedisFind.keyBuilder("tm", "raw", satelliteId);
+		long size = redisTemplate.opsForList().size(rawKey);
+		for (int index = 0; index < size; index++) {
+			TmRsltFrameVO vo = (TmRsltFrameVO) redisTemplate.opsForList().index(rawKey, index);
+			//对象深拷贝
+			//TmRsltFrameVO copyVO = vo.clone();
+			//源码参数ID
+			//int id = vo.getId();
+			//源码参数代号
+			String codeName = vo.getCodeName();
+			//源码参数起始波道
+			//int bd = vo.getBd();
+			//源码参数值
+			String value = vo.getValue();
+			//源码参数数据类型
+			String srcType = vo.getSrcType();
+			//源码参数仿真类型
+			String paramType = vo.getParamType();
+			//源码参数系数
+			double coefficient = vo.getCoefficient();
+			
+			//仿真参数
+			SitmParam param = null;
+			if (Arrays.binarySearch(GlobalConstant.GPS_PARAMS, codeName) > -1) {  //GPS数据
+				//GPS数据帧
+				//GpsFrame gpsFrame = GlobalAccess.getGpsFrame(satelliteId);
+				// 控制秒间隔为1
+				//if ("GPS_SpeedZ".equals(codeName)) {
+				//	// 计数+1
+				//	GlobalAccess.incrementGpsFrameCountMap(satelliteId);
+				//}			
+				
+				//得到GPS遥测参数的字节，并写入ByteBuffer
+				AbstractSitmGps sitmGps = SitmGpsFactory.getInstance(codeName);
+				if (sitmGps != null && gpsFrame != null) {
+					param = sitmGps.getGpsParam(satelliteId, value, gpsFrame);
+					vo.setParamType("increment");
+					vo.setCoefficient(1);
+					
+				}
+			} else {  //非GPS数据
+				//得到源码参数的字节，并写入ByteBuffer
+				param = SitmTypeFactory.getInstance(srcType)
+				                       .getSitmParam(value, paramType, coefficient);
+				
+			}
+			
+			if (param != null) {
+				//根据波道起始位置和参数字节长度写入源码仿真字节数组
+				int start = vo.getBd() - 1;
+			    int length = param.getBuffer().length;
+			    System.arraycopy(param.getBuffer(), 0, data, start, length);
+			    
+			    //更新源码参数的值，并写入Redis
+			    vo.setValue(param.getValue());
+			    
+			    redisTemplate.opsForList().set(rawKey, index, vo);
+			}
+		}
+		
+		return data;
+	}
+	
+	
+	private double[][] fromECItoECEF(long timeStamp, double[][] rv) {
+		// 本地时间转UTC
+		//long localTimeInMillis = current.getTime();
+        /** long时间转换成Calendar */
+        Calendar calendar= Calendar.getInstance();
+        calendar.setTimeInMillis(timeStamp);
+        /** 取得时间偏移量 */
+        int zoneOffset = calendar.get(java.util.Calendar.ZONE_OFFSET);
+        /** 取得夏令时差 */
+        int dstOffset = calendar.get(java.util.Calendar.DST_OFFSET);
+        /** 从本地时间里扣除这些差量，即可以取得UTC时间*/
+        calendar.add(java.util.Calendar.MILLISECOND, -(zoneOffset + dstOffset));
+        /** 取得的时间就是UTC标准时间 */
+        //Date utcDate=new Date(calendar.getTimeInMillis());
+		
+        // 得到儒略日, 月份从0开始, 24小时制
+		double[] jdut1 = Sgp4.jday(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DATE), calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
+		// 得到恒星时
+		double gstime = Sgp4.gstime(jdut1[0] + jdut1[1]);
+		
+		// ECEF的坐标初值
+		double r[] = new double[3];
+        double v[] = new double[3];
+		
+		// 坐标系转换(位置)
+		r[0] =  Math.cos(gstime) * rv[0][0] + Math.sin(gstime) * rv[0][1];
+		r[1] = -Math.sin(gstime) * rv[0][0] + Math.cos(gstime) * rv[0][1];
+		r[2] =  rv[0][2];
+	    
+	    // 坐标系转换(速度)
+		v[0] =  Math.cos(gstime) * rv[1][0] + Math.sin(gstime) * rv[1][1] + GlobalConstant.WZ * r[1];
+		v[1] = -Math.sin(gstime) * rv[1][0] + Math.cos(gstime) * rv[1][1] - GlobalConstant.WZ * r[0];
+		v[2] =  rv[1][2];
+		
+		double[][] rvECEF = { r, v };
+
+		return rvECEF;
+	}
+	
+	
+	
+	
 	
 	
 	

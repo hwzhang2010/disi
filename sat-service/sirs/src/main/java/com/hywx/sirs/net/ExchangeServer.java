@@ -1,21 +1,34 @@
 package com.hywx.sirs.net;
 
+import java.nio.ByteOrder;
 import java.util.List;
 
 import com.hywx.sirs.global.GlobalVector;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.AdaptiveRecvByteBufAllocator;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.FixedRecvByteBufAllocator;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 //@Component
 public class ExchangeServer {
+	
+	private static final ByteOrder BYTE_ORDER       = ByteOrder.LITTLE_ENDIAN;
+    //最大长度
+    private static final int MAX_FRAME_LENGTH       = 100000;
+    //长度字段所占的字节数
+    private static final int LENGTH_FIELD_LENGTH    = 2;
+    //长度偏移
+    private static final int LENGTH_FIELD_OFFSET    = 30;
+    private static final int LENGTH_ADJUSTMENT      = 0;
+    private static final int INITIAL_BYTES_TO_STRIP = 0;
 
 	public ExchangeServer() {
 	}
@@ -32,11 +45,13 @@ public class ExchangeServer {
 			      .channel(NioServerSocketChannel.class)  //// 设置通道的建立方式, 采用Nio的通道方式来建立请求连接
 			      .option(ChannelOption.SO_BACKLOG, 1024)  // 设置Tcp缓冲区
 			      .option(ChannelOption.SO_RCVBUF, 32 * 1024)  // 设置接收缓冲大小
+			      //.childOption(ChannelOption.RCVBUF_ALLOCATOR, new AdaptiveRecvByteBufAllocator(64, 65535, 65535))
 			      .childHandler(new ChannelInitializer<SocketChannel>() {
                     //构造一个由通道处理器构成的通道管道流水线
 					@Override
 					protected void initChannel(SocketChannel ch) {
 						//配置具体数据接收方法的处理
+						ch.pipeline().addLast("decoder", new MessagePacketByLengthDecoder(BYTE_ORDER,MAX_FRAME_LENGTH,LENGTH_FIELD_OFFSET,LENGTH_FIELD_LENGTH,LENGTH_ADJUSTMENT,INITIAL_BYTES_TO_STRIP,false));
 						ch.pipeline().addLast(new ExchangeServerHandler());
 					}
 			    	  
@@ -68,11 +83,13 @@ public class ExchangeServer {
 			      .channel(NioServerSocketChannel.class)  //// 设置通道的建立方式, 采用Nio的通道方式来建立请求连接
 			      .option(ChannelOption.SO_BACKLOG, 1024)  // 设置Tcp缓冲区
 			      .option(ChannelOption.SO_RCVBUF, 32 * 1024)  // 设置接收缓冲大小
+			      .childOption(ChannelOption.RCVBUF_ALLOCATOR, new AdaptiveRecvByteBufAllocator(64, 65535, 65535))
 			      .childHandler(new ChannelInitializer<SocketChannel>() {
                     //构造一个由通道处理器构成的通道管道流水线
 					@Override
 					protected void initChannel(SocketChannel ch) {
 						//配置具体数据接收方法的处理
+						//ch.pipeline().addLast("decoder", new MessagePacketByLengthDecoder(BYTE_ORDER,MAX_FRAME_LENGTH,LENGTH_FIELD_OFFSET,LENGTH_FIELD_LENGTH,LENGTH_ADJUSTMENT,INITIAL_BYTES_TO_STRIP,false));
 						ch.pipeline().addLast(new ExchangeServerHandler());
 					}
 			    	  

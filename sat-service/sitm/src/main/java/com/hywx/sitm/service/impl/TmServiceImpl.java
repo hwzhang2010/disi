@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import com.hywx.sitm.global.GlobalConstant;
 import com.hywx.sitm.mapper.SatelliteMapper;
 import com.hywx.sitm.mapper.TmMapper;
 import com.hywx.sitm.po.Satellite;
@@ -23,7 +24,6 @@ import com.hywx.sitm.vo.TmRsltFrameVO;
 
 @Service("tmService")
 public class TmServiceImpl implements TmService {
-	private final String tableNamePrefix = "RTFRAMEPARAMETER_";
 	//private final int SATELLITE_COUNT_IN_GROUP = 48;
 	
 	@Resource
@@ -38,6 +38,24 @@ public class TmServiceImpl implements TmService {
 	public List<TmRsltFrame> listTmRsltFrames(String tableName) {
 		
 		return tmMapper.listTmRsltFrames(tableName);
+	}
+	
+	@Override
+	public int existTmRsltFrame(String tableName) {
+		
+		return tmMapper.existTmRsltFrame(tableName);
+	}
+
+	@Override
+	public void dropTmRsltFrame(String tableName) {
+		
+		tmMapper.dropTmRsltFrame(tableName);
+	}
+
+	@Override
+	public void createTmRsltFrame(String tableName) {
+		
+		tmMapper.createTmRsltFrame(tableName);
 	}
 
 	@Override
@@ -108,9 +126,11 @@ public class TmServiceImpl implements TmService {
 		//把组内卫星的遥测仿真参数放入Redis
 		for (String satelliteId : satelliteIdList) {
 			//所有卫星列表信息
-			List<TmRsltFrame> frameList = listTmRsltFrames(tableNamePrefix.concat(satelliteId));
+			StringBuilder tableName = new StringBuilder(GlobalConstant.TM_TABLENAME_PREFIX);
+			tableName.append(satelliteId);
+			List<TmRsltFrame> frameList = listTmRsltFrames(tableName.toString());
 			if (frameList.isEmpty())
-				return;
+				continue;
 			
 			List<TmRsltFrameVO> voList = new ArrayList<>();
 			for (TmRsltFrame frame : frameList) 
@@ -121,6 +141,7 @@ public class TmServiceImpl implements TmService {
 			for (TmRsltFrameVO vo : voList)
 			    redisTemplate.opsForList().rightPush(rawKey, vo);
 		}
+		
 		
 		//手动添加自动发送的卫星ID到Redis
 		//redisTemplate.opsForSet().add(autoKey, "0101");
@@ -374,5 +395,7 @@ public class TmServiceImpl implements TmService {
 		
 		return false;
 	}
+
+	
 
 }

@@ -15,7 +15,11 @@ import com.hywx.siin.po.GroundStationPass;
 import com.hywx.siin.po.SatelliteAngle;
 import com.hywx.siin.po.SatelliteCover;
 import com.hywx.siin.po.SatelliteRange;
+import com.hywx.siin.po.SatelliteRegion;
+import com.hywx.siin.po.SatelliteSingle;
+import com.hywx.siin.po.SatelliteMulti;
 import com.hywx.siin.po.SatelliteTle;
+import com.hywx.siin.po.SatelliteWaveBeam;
 
 @Mapper
 @Component
@@ -98,7 +102,7 @@ public interface OrbitMapper {
 	
 	/**************************卫星覆盖半径(含星下点)*******************************************/
 	// 查询卫星覆盖半径数据
-	@Select("SELECT EPOCH, LNG, LAT, ALT, RADIUS, GROUNDSTATIONS FROM T_SATELLITE_COVER")
+	@Select("SELECT EPOCH, SUBSTAR, RADIUS, GROUNDSTATIONS FROM T_SATELLITE_COVER")
 	List<SatelliteCover> listCovers();
 	
 	// 清空表数据
@@ -106,15 +110,15 @@ public interface OrbitMapper {
     int deleteCover();
     
     // 插入1条卫星覆盖半径数据
-    @Insert("INSERT INTO T_SATELLITE_COVER(EPOCH, LNG, LAT, ALT, RADIUS, GROUNDSTATIONS) VALUES(#{epoch}, #{lng}, #{lat}, #{alt}, #{radius}, #{groundStations})")
+    @Insert("INSERT INTO T_SATELLITE_COVER(EPOCH, SUBSTAR, RADIUS, GROUNDSTATIONS) VALUES(#{epoch}, #{substar}, #{radius}, #{groundStations})")
     int insertCover(SatelliteCover cover);
 	
 	// 批量插入卫星覆盖半径数据
 	@Insert({
 		"<script>",
-		 "insert into T_SATELLITE_COVER(EPOCH, LNG, LAT, ALT, RADIUS, GROUNDSTATIONS) values ",
+		 "insert into T_SATELLITE_COVER(EPOCH, SUBSTAR, RADIUS, GROUNDSTATIONS) values ",
 		 "<foreach collection='list' item='item' index='index' separator=','>",
-		 "(#{item.epoch}, #{item.lng}, #{item.lat}, #{item.alt}, #{item.radius}, #{item.groundStations})",
+		 "(#{item.epoch}, #{item.substar}, #{item.radius}, #{item.groundStations})",
 		 "</foreach>",
 		 "</script>"
 	})
@@ -169,6 +173,105 @@ public interface OrbitMapper {
 		 "</script>"
 	})
 	int insertBatchFollow(@Param(value = "list") List<GroundStationFollow> list);
+	
+	
+	/**************************链路覆盖：单星覆盖*******************************************/
+	// 查询卫星覆盖数据
+	@Select("SELECT EPOCH, SUBSTAR, SUBANGLE, EARTHANGLE, COVERAREA FROM T_SATELLITE_SINGLE")
+	List<SatelliteSingle> listSingles();
+	
+	// 清空表数据
+    @Delete("DELETE FROM T_SATELLITE_SINGLE")
+    int deleteSingle();
+    
+    // 插入1条卫星覆盖数据
+    @Insert("INSERT INTO T_SATELLITE_SINGLE(EPOCH, SUBSTAR, SUBANGLE, EARTHANGLE, COVERAREA) VALUES(#{epoch}, #{substar}, #{subAngle}, #{earthAngle}, #{coverArea})")
+    int insertSingle(SatelliteSingle single);
+	
+	// 批量插入卫星覆盖数据
+	@Insert({
+		"<script>",
+		 "insert into T_SATELLITE_SINGLE(EPOCH, SUBSTAR, SUBANGLE, EARTHANGLE, COVERAREA) values ",
+		 "<foreach collection='list' item='item' index='index' separator=','>",
+		 "(#{item.epoch}, #{item.substar}, #{item.subAngle}, #{item.earthAngle}, #{item.coverArea})",
+		 "</foreach>",
+		 "</script>"
+	})
+	int insertBatchSingle(@Param(value = "list") List<SatelliteSingle> list);
+	
+	/**************************链路覆盖：多星覆盖*******************************************/
+	// 查询卫星覆盖数据
+	@Select("SELECT SATELLITEID, COUNT, DURATION FROM T_SATELLITE_MULTI")
+	List<SatelliteMulti> listMultis();
+	
+	// 清空表数据
+    @Delete("DELETE FROM T_SATELLITE_MULTI")
+    int deleteMulti();
+    
+    // 插入1条卫星覆盖数据
+    @Insert("INSERT INTO T_SATELLITE_MULTI(SATELLITEID, COUNT, DURATION) VALUES(#{satelliteId}, #{count}, #{duration})")
+    int insertMulti(SatelliteMulti single);
+	
+	// 批量插入卫星覆盖数据
+	@Insert({
+		"<script>",
+		 "insert into T_SATELLITE_MULTI(SATELLITEID, COUNT, DURATION) values ",
+		 "<foreach collection='list' item='item' index='index' separator=','>",
+		 "(#{item.satelliteId}, #{item.count}, #{item.duration})",
+		 "</foreach>",
+		 "</script>"
+	})
+	int insertBatchMulti(@Param(value = "list") List<SatelliteMulti> list);
+	
+	/**************************链路覆盖：地域覆盖*******************************************/
+	// 查询卫星覆盖数据
+	@Select("SELECT EPOCH, RATIO FROM T_SATELLITE_REGION")
+	List<SatelliteRegion> listRegions();
+	
+	// 清空表数据
+    @Delete("DELETE FROM T_SATELLITE_REGION")
+    int deleteRegion();
+    
+    // 插入1条卫星覆盖数据
+    @Insert("INSERT INTO T_SATELLITE_REGION(EPOCH, RATIO) VALUES(#{epoch}, #{ratio})")
+    int insertRegion(SatelliteRegion region);
+	
+	// 批量插入卫星覆盖数据
+	@Insert({
+		"<script>",
+		 "insert into T_SATELLITE_REGION(EPOCH, RATIO) values ",
+		 "<foreach collection='list' item='item' index='index' separator=','>",
+		 "(#{item.epoch}, #{item.ratio})",
+		 "</foreach>",
+		 "</script>"
+	})
+	int insertBatchRegion(@Param(value = "list") List<SatelliteRegion> list);
+	
+	/**************************点波束：覆盖边界*******************************************/
+	// 查询点波束覆盖边界数据
+	@Select("SELECT EPOCH, LNG, LAT FROM T_SATELLITE_WAVEBEAM")
+	List<SatelliteWaveBeam> listWaveBeams();
+	
+	// 清空表数据
+    @Delete("DELETE FROM T_SATELLITE_WAVEBEAM")
+    int deleteWaveBeam();
+    
+    // 插入1条卫星点波束覆盖边界数据
+    @Insert("INSERT INTO T_SATELLITE_WAVEBEAM(EPOCH, LNG, LAT) VALUES(#{epoch}, #{lng}, #{lat})")
+    int insertWaveBeam(SatelliteWaveBeam waveBeam);
+	
+	// 批量插入卫星点波束覆盖边界数据
+	@Insert({
+		"<script>",
+		 "insert into T_SATELLITE_WAVEBEAM(EPOCH, LNG, LAT) values ",
+		 "<foreach collection='list' item='item' index='index' separator=','>",
+		 "(#{item.epoch}, #{item.lng}, #{item.lat})",
+		 "</foreach>",
+		 "</script>"
+	})
+	int insertBatchWaveBeam(@Param(value = "list") List<SatelliteWaveBeam> list);
+	
+	
 	
 
 }

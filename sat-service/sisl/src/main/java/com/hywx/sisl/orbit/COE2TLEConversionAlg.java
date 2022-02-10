@@ -9,6 +9,7 @@ import com.hywx.sisl.orbit.tle.TLEBuilder;
 
 
 
+
 /**  
  *  @Project       : testObject;
  *  @Program Name  : .COE2TLEConversion.java;
@@ -364,7 +365,7 @@ public class COE2TLEConversionAlg {
 		
 		int satelliteNumber = 40930;
 		String internationalDesignator = "15052A";
-		long epoch = 1602663007000L; // Milliseconds since Jan 1, 1970 00:00:00
+		long epoch = 1634659200000L; // Milliseconds since Jan 1, 1970 00:00:00
 		
 //		TLE tle = TLEBuilder.newBuilder("GW0305")
 //				.setSatelliteNumber(40930)
@@ -380,101 +381,60 @@ public class COE2TLEConversionAlg {
 //                .build();
 //		System.out.println(tle);
 		
-		double start = 128.7451;
-		for (int i = 0; i < 20; i++) {
-			String num = String.format("GW130%X", i + 1);
-			
-			double current = start + 18 * i;
-			if (current > 360)
-				current -= 360;
-			
-			TLE tle = TLEBuilder.newBuilder(num)
-					.setSatelliteNumber(40930)
-	                .setInternationalDesignator("15052A")
-	                .setEpoch(1602663007000L)
-	                .setElementSetNumber(999)
-	                .setOrbitalElements(41.6410, 118.4439, 0.0012549, 97.8883, current)
-	                .setRevolutions(6796)
-	                .setMeanMotion(15.5283968)
-	                .setFirstDerivativeMeanMotion(.00000876)
-	                .setDragTerm(.000034425)
-	                .setClassification('S')
-	                .build();
-			System.out.println(tle);
-		}
-		
-//		GroundStationPosition groundStationPosition = new GroundStationPosition(48.85333, 2.34861, 30);
-//		
-//		SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-//		String strDate="2020/10/14 16:10:07";
-//		
-//		
-//		String[] tleStr1 = {
-//				"ISS (ZARYA)",
-//				"1 00001U          20287.67369213  .00000000  00000-0  00000-0 0 00000",
-//				"2 00001 051.6410 118.4439 0012549 097.8883 128.7451 15.52839680000009"
-//		};
-//		TLE tle1 = new TLE(tleStr1);
-//		Satellite satellite1 = SatelliteFactory.createSatellite(tle1);
-//		
-//		
-//		String[] tleStr2 = {
-//				"ISS (ZARYA)",
-//				"1 00002U          20287.67369213  .00000000  00000-0  00000-0 0 00001",
-//				"2 00002 051.6410 118.4439 0012549 097.8883 188.7451 15.52839680000006"
-//		};
-//		TLE tle2 = new TLE(tleStr2);
-//		Satellite satellite2 = SatelliteFactory.createSatellite(tle2);
-//		
-//		
-//		String[] tleStr3 = {
-//				"ISS (ZARYA)",
-//				"1 00003U          20287.67369213  .00000000  00000-0  00000-0 0 00002",
-//				"2 00003 051.6410 118.4439 0012549 097.8883 248.7451 15.52839680000004"
-//		};
-//		TLE tle3 = new TLE(tleStr3);
-//		Satellite satellite3 = SatelliteFactory.createSatellite(tle3);
-//		
-//		
-//		String[] tleStr4 = {
-//				"ISS (ZARYA)",
-//				"1 00004U          20287.67369213  .00000000  00000-0  00000-0 0 00003",
-//				"2 00004 051.6410 118.4439 0012549 097.8883 308.7451 15.52839680000002"
-//		};
-//		TLE tle4 = new TLE(tleStr4);
-//		Satellite satellite4 = SatelliteFactory.createSatellite(tle4);
-//		
-//		
-//		
-//		try {
-//			SatPos satPos1 = satellite1.getPosition(groundStationPosition, sdf.parse(strDate));
-//			double lng1 = satPos1.getLongitude(); 
-//			if (lng1 > 180)
-//				satPos1.setLongitude(lng1 - 360);
-//			System.err.println(satPos1);
+//		double start = 128.7451;
+//		for (int i = 0; i < 20; i++) {
+//			String num = String.format("GW010%X", i + 1);
 //			
-//			SatPos satPos2 = satellite2.getPosition(groundStationPosition, sdf.parse(strDate));
-//			double lng2 = satPos2.getLongitude(); 
-//			if (lng2 > 180)
-//				satPos2.setLongitude(lng2 - 360);
-//			System.err.println(satPos2);
+//			double current = start + 18 * i;
+//			if (current > 360)
+//				current -= 360;
 //			
-//			SatPos satPos3 = satellite3.getPosition(groundStationPosition, sdf.parse(strDate));
-//			double lng3 = satPos3.getLongitude(); 
-//			if (lng3 > 180)
-//				satPos3.setLongitude(lng3 - 360);
-//			System.err.println(satPos3);
+//			TLE tle = TLEBuilder.newBuilder(num)
+//			 				  .setSatelliteNumber(40930)
+//			 			      .setInternationalDesignator("15052A")
+//							  .setEpoch(1602663007000L)
+//			 			      .setElementSetNumber(999)
+//			 		          .setOrbitalElements(86.5, 24.0, 0.0001, 124.000, current)
+//			 		          .setRevolutions(6796)
+//			 	              .setMeanMotion(13.424950599670)
+//			 			      .setFirstDerivativeMeanMotion(.00000876)
+//			 			      .setDragTerm(.000034425)
+//			 			      .setClassification('S')
+//			 			      .build();
 //			
-//			SatPos satPos4 = satellite4.getPosition(groundStationPosition, sdf.parse(strDate));
-//			double lng4 = satPos4.getLongitude(); 
-//			if (lng4 > 180)
-//				satPos4.setLongitude(lng4 - 360);
-//			System.err.println(satPos4);
-//		} catch (ParseException e) {
-//			e.printStackTrace();
+//			System.out.println(tle);
 //		}
 		
-		
+
+		for (int k = 0; k < 15; k++) {
+			double start = 19;
+			for (int i = 0; i < 20; i++) {
+				String num = String.format("GW%02X%02X", k+1, i + 1);
+				
+				double current = start + 18 * i;
+				if (current > 360)
+					current -= 360;
+				
+				double l = 24.0 + 24 * k;
+				if (l >= 360)
+					l -= 360;
+				
+				TLE tle = TLEBuilder.newBuilder(num)
+				 				  .setSatelliteNumber(40930)
+				 			      .setInternationalDesignator("15052A")
+								  .setEpoch(1634659200000L)
+				 			      .setElementSetNumber(999)
+				 		          .setOrbitalElements(86.5, l, 0.0001, 124.000, current)
+				 		          .setRevolutions(6796)
+				 	              .setMeanMotion(13.424950599670)
+				 			      .setFirstDerivativeMeanMotion(.00000876)
+				 			      .setDragTerm(.000034425)
+				 			      .setClassification('S')
+				 			      .build();
+				
+				System.out.println(String.format("%02X%02X", k+1, i + 1) + "," + tle);
+			}		
+		}
 		
 		
 		

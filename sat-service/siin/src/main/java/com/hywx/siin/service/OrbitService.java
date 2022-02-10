@@ -8,14 +8,18 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import com.alibaba.fastjson.JSONArray;
 import com.hywx.siin.common.Page;
 import com.hywx.siin.po.GroundStationFollow;
 import com.hywx.siin.po.GroundStationPass;
 import com.hywx.siin.po.SatelliteAngle;
 import com.hywx.siin.po.SatelliteCover;
 import com.hywx.siin.po.SatelliteRange;
+import com.hywx.siin.po.SatelliteRegion;
+import com.hywx.siin.po.SatelliteSingle;
+import com.hywx.siin.po.SatelliteMulti;
 import com.hywx.siin.po.SatelliteTle;
+import com.hywx.siin.po.SatelliteWaveBeam;
+import com.hywx.siin.vo.GroundStationMultiCoverVO;
 
 public interface OrbitService {
 	// 查询所有卫星的两行根数
@@ -43,6 +47,9 @@ public interface OrbitService {
 	@Update("UPDATE T_SATELLITE_TLE SET TLELINE0=#{tleLine0}, TLELINE1=#{tleLine1}, TLELINE2=#{tleLine2} WHERE SATELLITEID = #{satelliteId}")  
     int updateTle(@Param("tleLine0") String tleLine0, @Param("tleLine1") String tleLine1, @Param("tleLine2") String tleLine2, @Param("satelliteId") String satelliteId);
 
+	// 分页查询两行根数
+	Page listTleByPage(Integer currentPage, int pageSize);
+	
 	// 检验生成的两行根数的校验码
 	boolean verifyTle(String line1, String line2);
 	
@@ -58,9 +65,6 @@ public interface OrbitService {
 	
 	// 两行根数 -> 轨道根数
 	String[] getOrbitElemByTle(String line1, String line2);
-	
-	
-	
 	
 	
 	// 查询外测测距测速数据
@@ -91,7 +95,7 @@ public interface OrbitService {
 	List<SatelliteRange> listRanges(String satelliteId, String groundStationId, String start, Integer hours);
 
 	// 根据卫星ID, 信关站ID和时间区间计算卫星的外测测距测速(分页)
-	Page listRangesByPage(Integer currentPage, int pageSize);
+	Page listRangesByPage(Integer currentPage, Integer pageSize);
 
 	
 	// 查询外测测角数据
@@ -121,12 +125,12 @@ public interface OrbitService {
 	List<SatelliteAngle> listAngles(String satelliteId, String groundStationId, String start, Integer hours);
 		
 	// 根据卫星ID, 信关站ID和时间区间计算卫星的外测测角(分页)
-	Page listAnglesByPage(Integer currentPage, int pageSize);
+	Page listAnglesByPage(Integer currentPage, Integer pageSize);
 
 	    
 		
 	// 查询卫星覆盖半径数据
-	@Select("SELECT EPOCH, LNG, LAT, ALT, RADIUS, GROUNDSTATIONS FROM T_SATELLITE_COVER")
+	@Select("SELECT EPOCH, SUBSTAR, RADIUS, GROUNDSTATIONS FROM T_SATELLITE_COVER")
 	List<SatelliteCover> listCovers();
 	
 	// 清空表数据
@@ -134,25 +138,25 @@ public interface OrbitService {
     int deleteCover();
     
     // 插入1条卫星覆盖半径数据
-    @Insert("INSERT INTO T_SATELLITE_COVER(EPOCH, LNG, LAT, ALT, RADIUS, GROUNDSTATIONS) VALUES(#{epoch}, #{lng}, #{lat}, #{alt}, #{radius}, #{groundStations})")
+    @Insert("INSERT INTO T_SATELLITE_COVER(EPOCH, SUBSTAR, RADIUS, GROUNDSTATIONS) VALUES(#{epoch}, #{substar}, #{radius}, #{groundStations})")
     int insertCover(SatelliteCover cover);
 	
 	// 批量插入卫星覆盖半径数据
 	@Insert({
 		"<script>",
-		 "insert into T_SATELLITE_COVER(EPOCH, LNG, LAT, ALT, RADIUS, GROUNDSTATIONS) values ",
+		 "insert into T_SATELLITE_COVER(EPOCH, SUBSTAR, RADIUS, GROUNDSTATIONS) values ",
 		 "<foreach collection='list' item='item' index='index' separator=','>",
-		 "(#{item.epoch}, #{item.lng}, #{item.lat}, #{item.alt}, #{item.radius}, #{item.groundStations})",
+		 "(#{item.epoch}, #{item.substar}, #{item.radius}, #{item.groundStations})",
 		 "</foreach>",
 		 "</script>"
 	})
 	int insertBatchCover(@Param(value = "list") List<SatelliteCover> list);
 	
 	// 根据卫星ID, 信关站ID和时间区间计算卫星覆盖半径和过境的信关站
-	List<SatelliteCover> listCovers(String satelliteId, JSONArray groundStationIdArray, String start, Integer hours);
+	List<SatelliteCover> listCovers(String satelliteId, List<String> groundStationIdList, String start, Integer hours);
 	
 	// 根据卫星ID, 信关站ID和时间区间计算卫星覆盖半径和过境的信关站(分页)
-	Page listCoversByPage(Integer currentPage, int pageSize);
+	Page listCoversByPage(Integer currentPage, Integer pageSize);
 	
 	
 	// 查询卫星过境数据
@@ -182,7 +186,7 @@ public interface OrbitService {
 	List<GroundStationPass> listPasses(String satelliteId, String groundStationId, String start, Integer hours);
 	
 	// 根据卫星ID, 信关站ID和时间区间计算卫星的过境时间
-	Page listPassesByPage(Integer currentPage, int pageSize);
+	Page listPassesByPage(Integer currentPage, Integer pageSize);
 	
 	
 	// 查询信关站跟踪数据
@@ -212,8 +216,138 @@ public interface OrbitService {
 	List<GroundStationFollow> listFollows(String satelliteId, String groundStationId, String start);
 	
 	// 根据卫星ID, 信关站ID和时间区间计算信关站的跟踪角度
-	Page listFollowsByPage(Integer currentPage, int pageSize);
+	Page listFollowsByPage(Integer currentPage, Integer pageSize);
 	
+	// 查询卫星覆盖数据
+	@Select("SELECT EPOCH, SUBSTAR, SUBANGLE, EARTHANGLE, COVERAREA FROM T_SATELLITE_SINGLE")
+	List<SatelliteSingle> listSingles();
 	
+	// 清空表数据
+    @Delete("DELETE FROM T_SATELLITE_SINGLE")
+    int deleteSingle();
+    
+    // 插入1条卫星覆盖数据
+    @Insert("INSERT INTO T_SATELLITE_SINGLE(EPOCH, SUBSTAR, SUBANGLE, EARTHANGLE, COVERAREA) VALUES(#{epoch}, #{substar}, #{subAngle}, #{earthAngle}, #{coverArea})")
+    int insertSingle(SatelliteSingle single);
+	
+	// 批量插入卫星覆盖数据
+	@Insert({
+		"<script>",
+		 "insert into T_SATELLITE_SINGLE(EPOCH, SUBSTAR, SUBANGLE, EARTHANGLE, COVERAREA) values ",
+		 "<foreach collection='list' item='item' index='index' separator=','>",
+		 "(#{item.epoch}, #{item.substar}, #{item.subAngle}, #{item.earthAngle}, #{item.coverArea})",
+		 "</foreach>",
+		 "</script>"
+	})
+	int insertBatchSingle(@Param(value = "list") List<SatelliteSingle> list);
+	
+	// 根据卫星ID和时间区间计算卫星覆盖
+	List<SatelliteSingle> listSingles(String satelliteId, Double minPitch, String start, Integer hours);
+		
+	// 根据卫星ID和时间区间计算卫星覆盖(分页)
+	Page listSinglesByPage(Integer currentPage, Integer pageSize);
+	
+	// 根据卫星ID, 信关站ID和时间区间计算卫星覆盖
+	SatelliteMulti getSingleCover(String satelliteId, String groundStationId, Double minPitch, String start, Integer hours);
 
+	// 根据卫星ID列表, 信关站ID和时间区间计算卫星覆盖
+	List<SatelliteMulti> listSatelliteSingleCover(List<String> satelliteIdList, String groundStationId, Double minPitch, String start, Integer hours);
+		
+	// 根据卫星ID, 信关站ID列表和时间区间计算卫星覆盖
+	List<GroundStationMultiCoverVO> listGroundStationMultiCover(String satelliteId, List<String> groundStationIdList, Double minPitch, String start, Integer hours);
+	
+	// 查询卫星覆盖数据
+	@Select("SELECT SATELLITEID, COUNT, DURATION FROM T_SATELLITE_MULTI")
+	List<SatelliteMulti> listMultis();
+	
+	// 清空表数据
+    @Delete("DELETE FROM T_SATELLITE_MULTI")
+    int deleteMulti();
+    
+    // 插入1条卫星覆盖数据
+    @Insert("INSERT INTO T_SATELLITE_MULTI(SATELLITEID, COUNT, DURATION) VALUES(#{satelliteId}, #{count}, #{duration})")
+    int insertMulti(SatelliteMulti single);
+	
+	// 批量插入卫星覆盖数据
+	@Insert({
+		"<script>",
+		 "insert into T_SATELLITE_MULTI(SATELLITEID, COUNT, DURATION) values ",
+		 "<foreach collection='list' item='item' index='index' separator=','>",
+		 "(#{item.satelliteId}, #{item.count}, #{item.duration})",
+		 "</foreach>",
+		 "</script>"
+	})
+	int insertBatchMulti(@Param(value = "list") List<SatelliteMulti> list);
+			
+	// 根据卫星ID和时间区间计算卫星覆盖(分页)
+	Page listMultisByPage(Integer currentPage, Integer pageSize);
+	
+	// 查询卫星覆盖数据
+	@Select("SELECT EPOCH, RATIO FROM T_SATELLITE_REGION")
+	List<SatelliteRegion> listRegions();
+	
+	// 清空表数据
+    @Delete("DELETE FROM T_SATELLITE_REGION")
+    int deleteRegion();
+    
+    // 插入1条卫星覆盖数据
+    @Insert("INSERT INTO T_SATELLITE_REGION(EPOCH, RATIO) VALUES(#{epoch}, #{ratio})")
+    int insertRegion(SatelliteRegion region);
+	
+	// 批量插入卫星覆盖数据
+	@Insert({
+		"<script>",
+		 "insert into T_SATELLITE_REGION(EPOCH, RATIO) values ",
+		 "<foreach collection='list' item='item' index='index' separator=','>",
+		 "(#{item.epoch}, #{item.ratio})",
+		 "</foreach>",
+		 "</script>"
+	})
+	int insertBatchRegion(@Param(value = "list") List<SatelliteRegion> list);
+	
+	// 根据卫星ID, 经纬度区间和时间区间计算卫星覆盖
+	SatelliteMulti getRegionCover(String satelliteId, double minLng, double maxLng, double minLat, double maxLat, String start, Integer hours);
+
+	// 根据卫星ID, 经纬度区间和时间区间计算卫星覆盖
+	List<SatelliteRegion> listRegionCover(String satelliteId, double minLng, double maxLng, double minLat, double maxLat, String start, Integer hours);
+		
+	// 根据卫星ID和时间区间计算卫星覆盖(分页)
+	Page listRegionsByPage(Integer currentPage, Integer pageSize);
+	
+	
+	// 根据卫星ID, 时间计算卫星点波束区域(最大地心角)
+	List<SatelliteWaveBeam> listWaveBeam(String satelliteId, String datetime);
+	
+	// 根据卫星ID，视场角，时间计算卫星点波束区域
+	List<SatelliteWaveBeam> listWaveBeam(String satelliteId, String datetime, double viewAngle);
+	
+	// 根据卫星ID，视场角，侧视角，时间计算卫星点波束区域
+	List<SatelliteWaveBeam> listWaveBeam(String satelliteId, String datetime, double viewAngle, double swayAngle);
+	
+	// 根据卫星ID和时间区间计算卫星点波束区域(分页)
+	Page listWaveBeamsByPage(Integer currentPage, Integer pageSize);
+	
+	// 查询点波束覆盖边界数据
+	@Select("SELECT EPOCH, LNG, LAT FROM T_SATELLITE_WAVEBEAM")
+	List<SatelliteWaveBeam> listWaveBeams();
+	
+	// 清空表数据
+    @Delete("DELETE FROM T_SATELLITE_WAVEBEAM")
+    int deleteWaveBeam();
+    
+    // 插入1条卫星点波束覆盖边界数据
+    @Insert("INSERT INTO T_SATELLITE_WAVEBEAM(EPOCH, LNG, LAT) VALUES(#{epoch}, #{lng}, #{lat})")
+    int insertWaveBeam(SatelliteWaveBeam waveBeam);
+	
+	// 批量插入卫星点波束覆盖边界数据
+	@Insert({
+		"<script>",
+		 "insert into T_SATELLITE_WAVEBEAM(EPOCH, LNG, LAT) values ",
+		 "<foreach collection='list' item='item' index='index' separator=','>",
+		 "(#{item.epoch}, #{item.lng}, #{item.lat})",
+		 "</foreach>",
+		 "</script>"
+	})
+	int insertBatchWaveBeam(@Param(value = "list") List<SatelliteWaveBeam> list);
+	
 }

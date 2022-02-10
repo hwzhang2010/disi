@@ -16,6 +16,7 @@ import com.hywx.sitm.config.FileConfig;
 import com.hywx.sitm.mapper.SatelliteMapper;
 import com.hywx.sitm.po.GpsFrame;
 import com.hywx.sitm.po.Satellite;
+import com.hywx.sitm.po.SatelliteTle;
 import com.hywx.sitm.service.SatelliteService;
 
 @Service("satelliteService")
@@ -37,6 +38,12 @@ public class SatelliteServiceImpl implements SatelliteService {
 	public List<String> listSatelliteIds() {
 		
 		return satelliteMapper.listSatelliteIds();
+	}
+	
+	@Override
+	public SatelliteTle getSatelliteTle(String satelliteId) {
+		
+		return satelliteMapper.getTle(satelliteId);
 	}
 	
 	@Override
@@ -106,6 +113,8 @@ public class SatelliteServiceImpl implements SatelliteService {
 		
 		return frameList;
 	}
+
+	
 
 	
 

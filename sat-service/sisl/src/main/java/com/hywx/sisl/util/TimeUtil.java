@@ -1,10 +1,15 @@
 package com.hywx.sisl.util;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 /**
  * 时间处理工具类
@@ -51,7 +56,7 @@ public class TimeUtil {
 		
 		Duration duration = Duration.between(from, to);
 		//计算时间和起点时间相差的天数
-		return duration.toDays();
+		return duration.toDays() + 1;
 	}
 	
 	/**
@@ -206,5 +211,50 @@ public class TimeUtil {
 		//18表示跳秒
 		return duration.toMillis() / 1000.0 + SECOND_SKIP;
 	}
+	
+	/**
+     * local时间转换成UTC时间
+     *
+     * @param localDate
+     * @return
+     */
+    public static Date localToUTC(Date localDate) {
+        long localTimeInMillis = localDate.getTime();
+        /** long时间转换成Calendar */
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(localTimeInMillis);
+        /** 取得时间偏移量 */
+        int zoneOffset = calendar.get(java.util.Calendar.ZONE_OFFSET);
+        /** 取得夏令时差 */
+        int dstOffset = calendar.get(java.util.Calendar.DST_OFFSET);
+        /** 从本地时间里扣除这些差量，即可以取得UTC时间*/
+        calendar.add(java.util.Calendar.MILLISECOND, -(zoneOffset + dstOffset));
+        /** 取得的时间就是UTC标准时间 */
+        Date utcDate = new Date(calendar.getTimeInMillis());
+        
+        return utcDate;
+    }
+
+
+    /**
+     * utc时间转成local时间
+     *
+     * @param utcDate
+     * @return
+     */
+    public static Date utcToLocal(Date utcDate) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getDefault());
+        
+        Date localDate = null;
+        String localTime = sdf.format(utcDate.getTime());
+        try {
+            localDate = sdf.parse(localTime);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        
+        return localDate;
+    }
 	
 }

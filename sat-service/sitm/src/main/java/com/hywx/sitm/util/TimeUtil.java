@@ -51,7 +51,7 @@ public class TimeUtil {
 		
 		Duration duration = Duration.between(from, to);
 		//计算时间和起点时间相差的天数
-		return duration.toDays();
+		return duration.toDays() + 1;
 	}
 	
 	/**

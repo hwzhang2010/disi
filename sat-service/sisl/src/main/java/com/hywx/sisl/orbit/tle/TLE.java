@@ -669,7 +669,8 @@ public final class TLE {
     @Override
     public String toString() {
         if (title != null && title.trim().length() > 0) {
-            return String.format("%-24s%n%s%n%s", title, line1, line2);
+            //return String.format("%-24s%n%s%n%s", title, line1, line2);
+        	return String.format("%s,%s,%s", title, line1, line2);
         }
         return String.format("%s%n%s", line1, line2);
     }

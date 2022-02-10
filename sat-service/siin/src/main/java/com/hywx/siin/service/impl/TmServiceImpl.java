@@ -1,6 +1,5 @@
 package com.hywx.siin.service.impl;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,12 +15,16 @@ import org.springframework.stereotype.Service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hywx.siin.common.Page;
+import com.hywx.siin.global.GlobalConstant;
+import com.hywx.siin.mapper.GroundStationMapper;
 import com.hywx.siin.mapper.SatelliteMapper;
 import com.hywx.siin.mapper.TmMapper;
 import com.hywx.siin.po.SatelliteInfo;
 import com.hywx.siin.po.TmRsltFrame;
 import com.hywx.siin.redis.RedisFind;
 import com.hywx.siin.service.TmService;
+import com.hywx.sitm.vo.SitmGroundStationFaultVO;
+import com.hywx.sitm.vo.SitmSatelliteFaultVO;
 import com.hywx.sitm.vo.SitmSatelliteRunningVO;
 import com.hywx.sitm.vo.SitmSatelliteVO;
 import com.hywx.sitm.vo.TmRsltFrameVO;
@@ -29,12 +32,14 @@ import com.hywx.sitm.vo.TmRsltFrameVO;
 
 @Service("tmService")
 public class TmServiceImpl implements TmService {
-	private final String tableNamePrefix = "RTFRAMEPARAMETER_";
+	//private final String tableNamePrefix = "RTFRAMEPARAMETER_";
 	
 	@Resource
     private TmMapper tmMapper;
 	@Resource
 	private SatelliteMapper satelliteMapper;
+	@Resource
+	private GroundStationMapper groundStationMapper;
 	
 	@Autowired
 	private RedisTemplate<String, Object> redisTemplate;
@@ -46,9 +51,21 @@ public class TmServiceImpl implements TmService {
 	}
 	
 	@Override
-	public int existTmRsltTable(String tableName) {
+	public int existTmRsltFrame(String tableName) {
 		
-		return tmMapper.existTmRsltTable(tableName);
+		return tmMapper.existTmRsltFrame(tableName);
+	}
+
+	@Override
+	public int dropTmRsltFrame(String tableName) {
+		
+		return tmMapper.dropTmRsltFrame(tableName);
+	}
+
+	@Override
+	public int createTmRsltFrame(String tableName) {
+		
+		return tmMapper.createTmRsltFrame(tableName);
 	}
 	
 	@Override
@@ -75,41 +92,67 @@ public class TmServiceImpl implements TmService {
 	
 	@Override
 	public int existTmRsltTable2(String satelliteId) {
-		String tableName = tableNamePrefix.concat(satelliteId);
+		//String tableName = tableNamePrefix.concat(satelliteId);
+		StringBuilder tableName = new StringBuilder(GlobalConstant.TM_TABLENAME_PREFIX);
+		tableName.append(satelliteId);
 		
-		return existTmRsltTable(tableName);
+		return existTmRsltFrame(tableName.toString());
+	}
+	
+	@Override
+	public int dropTmRsltFrame2(String satelliteId) {
+		StringBuilder tableName = new StringBuilder(GlobalConstant.TM_TABLENAME_PREFIX);
+		tableName.append(satelliteId);
+		
+		return tmMapper.dropTmRsltFrame(tableName.toString());
+	}
+
+	@Override
+	public int createTmRsltFrame2(String satelliteId) {
+		StringBuilder tableName = new StringBuilder(GlobalConstant.TM_TABLENAME_PREFIX);
+		tableName.append(satelliteId);
+		
+		return tmMapper.createTmRsltFrame(tableName.toString());
 	}
 	
 	@Override
 	public int insertTmRslt(String satelliteId, TmRsltFrame rslt) {
-		String tableName = tableNamePrefix.concat(satelliteId);
+		//String tableName = tableNamePrefix.concat(satelliteId);
+		StringBuilder tableName = new StringBuilder(GlobalConstant.TM_TABLENAME_PREFIX);
+		tableName.append(satelliteId);
 		
-		return insertTmRslt(tableName, rslt.getCodeName(), rslt.getName(), rslt.getId(), rslt.getSrcType(), rslt.getRsltType(), rslt.getBd(), rslt.getBitRange(), rslt.getByteOrder(), rslt.getCoefficient(), rslt.getAlgorithm(), rslt.getRange(), rslt.getPreCondition(), rslt.getValidFrameCnt(), rslt.getFrameId(), rslt.getSubsystemId(), rslt.getObjId());
+		return insertTmRslt(tableName.toString(), rslt.getCodeName(), rslt.getName(), rslt.getId(), rslt.getSrcType(), rslt.getRsltType(), rslt.getBd(), rslt.getBitRange(), rslt.getByteOrder(), rslt.getCoefficient(), rslt.getAlgorithm(), rslt.getRange(), rslt.getPreCondition(), rslt.getValidFrameCnt(), rslt.getFrameId(), rslt.getSubsystemId(), rslt.getObjId());
 	}
 	
 	@Override
 	public int deleteTmRslt2(String satelliteId, int id) {
-		String tableName = tableNamePrefix.concat(satelliteId);
+		//String tableName = tableNamePrefix.concat(satelliteId);
+		StringBuilder tableName = new StringBuilder(GlobalConstant.TM_TABLENAME_PREFIX);
+		tableName.append(satelliteId);
 		
-		return deleteTmRslt(tableName, id);
+		return deleteTmRslt(tableName.toString(), id);
 	}
 
 	@Override
 	public int updateTmRslt(String satelliteId, TmRsltFrame rslt) {
-		String tableName = tableNamePrefix.concat(satelliteId);
+		//String tableName = tableNamePrefix.concat(satelliteId);
+		StringBuilder tableName = new StringBuilder(GlobalConstant.TM_TABLENAME_PREFIX);
+		tableName.append(satelliteId);
 		
-		return updateTmRslt(tableName, rslt.getCodeName(), rslt.getName(), rslt.getSrcType(), rslt.getRsltType(), rslt.getBd(), rslt.getBitRange(), rslt.getByteOrder(), rslt.getCoefficient(), rslt.getAlgorithm(), rslt.getRange(), rslt.getPreCondition(), rslt.getValidFrameCnt(), rslt.getFrameId(), rslt.getSubsystemId(), rslt.getObjId(), rslt.getId());
+		return updateTmRslt(tableName.toString(), rslt.getCodeName(), rslt.getName(), rslt.getSrcType(), rslt.getRsltType(), rslt.getBd(), rslt.getBitRange(), rslt.getByteOrder(), rslt.getCoefficient(), rslt.getAlgorithm(), rslt.getRange(), rslt.getPreCondition(), rslt.getValidFrameCnt(), rslt.getFrameId(), rslt.getSubsystemId(), rslt.getObjId(), rslt.getId());
 	}
 	
 	@Override
 	public Page listTmRstlFramesByPage(String satelliteId, Integer currentPage, int pageSize) {
-		String tableName = tableNamePrefix.concat(satelliteId);
+		//String tableName = tableNamePrefix.concat(satelliteId);
+		StringBuilder tableName = new StringBuilder(GlobalConstant.TM_TABLENAME_PREFIX);
+		tableName.append(satelliteId);
 		
         Page page = new Page();
 		
 		// 分页
 		PageHelper.startPage(currentPage, pageSize);
-		List<TmRsltFrame> tmList = tmMapper.listTmRsltFrames(tableName);
+		List<TmRsltFrame> tmList = tmMapper.listTmRsltFrames(tableName.toString());
 		PageInfo<TmRsltFrame> pageInfo = new PageInfo<>(tmList);
 		
 		page.setCurrentPage(currentPage);
@@ -146,8 +189,9 @@ public class TmServiceImpl implements TmService {
 		
 		//卫星遥测仿真参数
 		String rawKey = RedisFind.keyBuilder("sitm", "tm", "raw", satelliteId);
-		if (!redisTemplate.hasKey(rawKey))
+		if (!redisTemplate.hasKey(rawKey)) {
 			return page;
+		}
 		
 		long size = redisTemplate.opsForList().size(rawKey);
 		
@@ -165,7 +209,7 @@ public class TmServiceImpl implements TmService {
         long toIndex = 0; 
 
         if (currentPage != pageCount) {
-            toIndex = fromIndex + pageSize;
+            toIndex = fromIndex + pageSize - 1;
         } else {
             toIndex = size - 1;
         }
@@ -429,6 +473,106 @@ public class TmServiceImpl implements TmService {
 		redisTemplate.opsForValue().set(countKey, 0);;
 		
 	}
+	
+	@Override
+	public String getGroundStationOfAutoSend(String satelliteId) {
+		// 默认北京站
+		String groundStationId = String.format("%08X", GlobalConstant.SID);
+		
+		String autoGroundStationKey = RedisFind.keyBuilder("sitm", "tm", "groundstation", satelliteId);
+		if (redisTemplate.hasKey(autoGroundStationKey)) {
+			groundStationId = (String) redisTemplate.opsForValue().get(autoGroundStationKey);
+		}
+		
+		return groundStationId;
+	}
+
+	@Override
+	public void updateGroundStationOfAutoSend(String satelliteId, String groundStationId) {
+		String autoGroundStationKey = RedisFind.keyBuilder("sitm", "tm", "groundstation", satelliteId);
+		// 更新redis中自动发送的信关站ID
+		redisTemplate.opsForValue().set(autoGroundStationKey, groundStationId);
+	}
+
+	@Override
+	public void updateSatelliteFault(List<String> satelliteIdList) {
+		String satelliteKey = RedisFind.keyBuilder("sitm", "tm", "fault", "satellite");
+		
+		// 首先清空
+		Set<Object> satelliteFaults = redisTemplate.opsForSet().members(satelliteKey);
+		for (Object obj : satelliteFaults) {  
+			redisTemplate.opsForSet().remove(satelliteKey, obj);
+		} 
+		// 然后添加
+		for (String satelliteId : satelliteIdList) {
+			if (!redisTemplate.opsForSet().isMember(satelliteKey, satelliteId)) {
+		 	    redisTemplate.opsForSet().add(satelliteKey, satelliteId);
+			}
+		}
+		
+	}
+
+	@Override
+	public void updateGroundStationFault(List<String> groundStationIdList) {
+        String groundStationKey = RedisFind.keyBuilder("sitm", "tm", "fault", "groundstation");
+		
+		// 首先清空
+		Set<Object> groundStationFaults = redisTemplate.opsForSet().members(groundStationKey);
+		for (Object obj : groundStationFaults) {  
+			redisTemplate.opsForSet().remove(groundStationKey, obj);
+		} 
+		// 然后添加
+		for (String groundStationId : groundStationIdList) {
+			if (!redisTemplate.opsForSet().isMember(groundStationKey, groundStationId)) {
+		 	    redisTemplate.opsForSet().add(groundStationKey, groundStationId);
+			}
+		}
+		
+	}
+
+	@Override
+	public SitmSatelliteFaultVO getSatelliteFaulting() {
+		int count = 0;
+		List<String> faultList = new ArrayList<>();
+		
+		String satelliteKey = RedisFind.keyBuilder("sitm", "tm", "fault", "satellite");
+		
+		Set<Object> satelliteFaults = redisTemplate.opsForSet().members(satelliteKey);
+		count += redisTemplate.opsForSet().size(satelliteKey);
+		for (Object obj : satelliteFaults) {  
+		    if (obj instanceof String) {
+		    	faultList.add(obj.toString());
+		    }
+		} 
+		
+		Collections.sort(faultList);
+		
+		return new SitmSatelliteFaultVO(count, faultList);
+	}
+
+	@Override
+	public SitmGroundStationFaultVO getGroundStationFaulting() {
+		int count = 0;
+		List<String> faultList = new ArrayList<>();
+		
+		String groundStationKey = RedisFind.keyBuilder("sitm", "tm", "fault", "groundstation");
+		
+		Set<Object> groundStationFaults = redisTemplate.opsForSet().members(groundStationKey);
+		count += redisTemplate.opsForSet().size(groundStationKey);
+		for (Object obj : groundStationFaults) {  
+		    if (obj instanceof String) {
+		    	faultList.add(obj.toString());
+		    }
+		}  
+		
+		Collections.sort(faultList);
+		
+		return new SitmGroundStationFaultVO(count, faultList);
+	}
+
+	
+
+	
 
 	
 

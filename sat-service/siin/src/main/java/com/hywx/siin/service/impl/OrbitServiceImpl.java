@@ -1,5 +1,7 @@
 package com.hywx.siin.service.impl;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,11 +12,9 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.github.amsacode.predict4java.GroundStationPosition;
 import com.github.amsacode.predict4java.PassPredictor;
+import com.github.amsacode.predict4java.Position;
 import com.github.amsacode.predict4java.SatNotFoundException;
 import com.github.amsacode.predict4java.SatPassTime;
 import com.github.amsacode.predict4java.SatPos;
@@ -24,7 +24,7 @@ import com.github.amsacode.predict4java.TLE;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hywx.siin.common.Page;
-import com.hywx.siin.common.Resp;
+import com.hywx.siin.global.GlobalAccess;
 import com.hywx.siin.global.GlobalConstant;
 import com.hywx.siin.mapper.GroundStationMapper;
 import com.hywx.siin.mapper.OrbitMapper;
@@ -33,12 +33,17 @@ import com.hywx.siin.orbit.tle.TLEBuilder;
 import com.hywx.siin.po.SatelliteAngle;
 import com.hywx.siin.po.SatelliteCover;
 import com.hywx.siin.po.SatelliteRange;
+import com.hywx.siin.po.SatelliteRegion;
+import com.hywx.siin.po.SatelliteSingle;
+import com.hywx.siin.po.SatelliteMulti;
 import com.hywx.siin.po.GroundStationFollow;
 import com.hywx.siin.po.GroundStationInfo;
 import com.hywx.siin.po.GroundStationPass;
 import com.hywx.siin.po.SatelliteTle;
+import com.hywx.siin.po.SatelliteWaveBeam;
 import com.hywx.siin.service.OrbitService;
-import com.hywx.siin.vo.SatelliteCoverVO;
+import com.hywx.siin.util.GisUtil;
+import com.hywx.siin.vo.GroundStationMultiCoverVO;
 
 @Service("orbitService")
 public class OrbitServiceImpl implements OrbitService {
@@ -86,6 +91,24 @@ public class OrbitServiceImpl implements OrbitService {
 	public int updateTle(String tleLine0, String tleLine1, String tleLine2, String satelliteId) {
 		
 		return orbitMapper.updateTle(tleLine0, tleLine1, tleLine2, satelliteId);
+	}
+	
+	@Override
+	public Page listTleByPage(Integer currentPage, int pageSize) {
+        Page page = new Page();
+		
+		// 分页
+		PageHelper.startPage(currentPage, pageSize);
+		List<SatelliteTle> tleList = orbitMapper.listTle();
+		PageInfo<SatelliteTle> pageInfo = new PageInfo<>(tleList);
+		
+		page.setCurrentPage(currentPage);
+		page.setPageSize(pageSize);
+		page.setTotalPage(pageInfo.getPages());
+		page.setDataList(tleList);
+		page.setTotal(pageInfo.getTotal());
+		
+		return page;
 	}
 	
 	@Override
@@ -240,7 +263,7 @@ public class OrbitServiceImpl implements OrbitService {
 		}
 		orbitMapper.insertBatchRange(list.subList(GlobalConstant.BATCH_NUM * count, list.size()));
 		
-		return 0;
+		return count;
 	}
 	
 	
@@ -284,7 +307,7 @@ public class OrbitServiceImpl implements OrbitService {
 	}
 
 	@Override
-	public Page listRangesByPage(Integer currentPage, int pageSize) {
+	public Page listRangesByPage(Integer currentPage, Integer pageSize) {
 		Page page = new Page();
 		
 		// 分页
@@ -330,7 +353,7 @@ public class OrbitServiceImpl implements OrbitService {
 		}
 		orbitMapper.insertBatchAngle(list.subList(GlobalConstant.BATCH_NUM * count, list.size()));
 		
-		return 0;
+		return count;
 	}
 	
 	@Override
@@ -372,7 +395,7 @@ public class OrbitServiceImpl implements OrbitService {
 	}
 
 	@Override
-	public Page listAnglesByPage(Integer currentPage, int pageSize) {
+	public Page listAnglesByPage(Integer currentPage, Integer pageSize) {
 		Page page = new Page();
 		// 分页
 		PageHelper.startPage(currentPage, pageSize);
@@ -419,17 +442,12 @@ public class OrbitServiceImpl implements OrbitService {
 		}
 		orbitMapper.insertBatchCover(list.subList(GlobalConstant.BATCH_NUM * count, list.size()));
 				
-		return 0;
+		return count;
 	}
 	
 	@Override
-	public List<SatelliteCover> listCovers(String satelliteId, JSONArray groundStationIdArray, String start, Integer hours) {
+	public List<SatelliteCover> listCovers(String satelliteId, List<String> groundStationIdList, String start, Integer hours) {
 		List<SatelliteCover> list = new ArrayList<>();
-		
-		//将json array数组转换成string
-		String jsonString = JSONObject.toJSONString(groundStationIdArray, SerializerFeature.WriteClassName);
-		//把string转换成list
-		List<String>  groundStationIdList = JSONObject.parseArray(jsonString, String.class);
 		
 		// 时间格式
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -482,23 +500,17 @@ public class OrbitServiceImpl implements OrbitService {
 	}
 	
 	@Override
-	public Page listCoversByPage(Integer currentPage, int pageSize) {
+	public Page listCoversByPage(Integer currentPage, Integer pageSize) {
 		Page page = new Page();
 		// 分页
 		PageHelper.startPage(currentPage, pageSize);
 		List<SatelliteCover> coverList = orbitMapper.listCovers();
 		PageInfo<SatelliteCover> pageInfo = new PageInfo<>(coverList);
 		
-		List<SatelliteCoverVO> voList = new ArrayList<>();
-		List<SatelliteCover> tempList = pageInfo.getList();
-		for (int i = 0; i < tempList.size(); i++) {
-			voList.add(tempList.get(i).getVO());
-		}
-		
 		page.setCurrentPage(currentPage);
 		page.setPageSize(pageSize);
 		page.setTotalPage(pageInfo.getPages());
-		page.setDataList(voList);
+		page.setDataList(coverList);
 		page.setTotal(pageInfo.getTotal());
 		
 		return page;
@@ -534,7 +546,7 @@ public class OrbitServiceImpl implements OrbitService {
 		}
 		orbitMapper.insertBatchPass(list.subList(GlobalConstant.BATCH_NUM * count, list.size()));
 						
-		return 0;
+		return count;
 	}
 	
 	@Override
@@ -577,7 +589,7 @@ public class OrbitServiceImpl implements OrbitService {
 	}
 
 	@Override
-	public Page listPassesByPage(Integer currentPage, int pageSize) {
+	public Page listPassesByPage(Integer currentPage, Integer pageSize) {
 		Page page = new Page();
 		// 分页
 		PageHelper.startPage(currentPage, pageSize);
@@ -623,7 +635,7 @@ public class OrbitServiceImpl implements OrbitService {
 		}
 		orbitMapper.insertBatchFollow(list.subList(GlobalConstant.BATCH_NUM * count, list.size()));
 						
-		return 0;
+		return count;
 	}
 
 	@Override
@@ -675,7 +687,7 @@ public class OrbitServiceImpl implements OrbitService {
 	}
 
 	@Override
-	public Page listFollowsByPage(Integer currentPage, int pageSize) {
+	public Page listFollowsByPage(Integer currentPage, Integer pageSize) {
 		Page page = new Page();
 		// 分页
 		PageHelper.startPage(currentPage, pageSize);
@@ -690,6 +702,675 @@ public class OrbitServiceImpl implements OrbitService {
 		
 		return page;
 	}
+
+	@Override
+	public List<SatelliteSingle> listSingles() {
+		
+		return orbitMapper.listSingles();
+	}
+
+	@Override
+	public int deleteSingle() {
+		
+		return orbitMapper.deleteSingle();
+	}
+
+	@Override
+	public int insertSingle(SatelliteSingle single) {
+		
+		return orbitMapper.insertSingle(single);
+	}
+
+	@Override
+	public int insertBatchSingle(List<SatelliteSingle> list) {
+		//清空表数据
+		orbitMapper.deleteSingle();
+	    //批量插入数据
+		int count = list.size() / GlobalConstant.BATCH_NUM;
+		for (int i = 0; i < count; i++) {
+			orbitMapper.insertBatchSingle(list.subList(GlobalConstant.BATCH_NUM * i, GlobalConstant.BATCH_NUM * (i + 1)));
+		}
+		orbitMapper.insertBatchSingle(list.subList(GlobalConstant.BATCH_NUM * count, list.size()));
+
+		return count;
+	}
+
+	@Override
+	public List<SatelliteSingle> listSingles(String satelliteId, Double minPitch, String start, Integer hours) {
+		List<SatelliteSingle> list = new ArrayList<>();
+		
+		// 时间格式
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			// 开始时间
+		    Date startDate = format.parse(start);
+		    // 持续小时数, 最多7天
+		 	hours = hours > 24 * 7 ? 24 * 7 : hours;
+		 	// 时间差(秒)
+		 	long seconds = hours * 60 * 60;
+			
+			// 实例化TLE
+			SatelliteTle satelliteTle = orbitMapper.getTle(satelliteId);
+			// 实例化SGP4计算的卫星
+			Satellite satellite = SatelliteFactory.createSatellite(new TLE(satelliteTle.getTle()));
+			// 使用SGP4计算卫星的覆盖范围
+			long timeStamp = startDate.getTime();
+			for (int i = 0; i < seconds; i++) {
+				Date date = new Date(timeStamp + i * 1000L);
+				
+				// 使用北京的地理坐标作为地面站进行计算卫星的位置
+				GroundStationPosition groundStationPosition = new GroundStationPosition(116, 39, 0);
+				SatPos satPos = satellite.getPosition(groundStationPosition, date);
+				// 卫星的星下点位置
+				double lng = satPos.getLongitude() * 180 / Math.PI;
+				double lat = satPos.getLatitude() * 180 / Math.PI;
+				double alt = satPos.getAltitude();
+				// 星下视角
+				double subAngle = Math.asin( GlobalConstant.EARTH_RADIUS_KM / (alt + GlobalConstant.EARTH_RADIUS_KM) * Math.cos(minPitch * Math.PI / 180.0) );
+				// 地心角
+				double earthAngle = Math.acos( GlobalConstant.EARTH_RADIUS_KM / (alt + GlobalConstant.EARTH_RADIUS_KM) * Math.cos(minPitch * Math.PI / 180.0) ) * 180 / Math.PI - minPitch;
+				// 覆盖面积
+				double coverArea = 4 * Math.PI * Math.pow(GlobalConstant.EARTH_RADIUS_KM, 2) * Math.sin(earthAngle / 2.0) * Math.sin(earthAngle / 2.0);
+				
+				SatelliteSingle single = new SatelliteSingle(date, lng, lat, alt, subAngle, earthAngle, coverArea);
+				list.add(single);
+			}
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
+		return list;
+	}
+
+	@Override
+	public Page listSinglesByPage(Integer currentPage, Integer pageSize) {
+		Page page = new Page();
+		// 分页
+		PageHelper.startPage(currentPage, pageSize);
+		List<SatelliteSingle> singleList = orbitMapper.listSingles();
+		PageInfo<SatelliteSingle> pageInfo = new PageInfo<>(singleList);
+		
+		page.setCurrentPage(currentPage);
+		page.setPageSize(pageSize);
+		page.setTotalPage(pageInfo.getPages());
+		page.setDataList(singleList);
+		page.setTotal(pageInfo.getTotal());
+		
+		return page;
+	}
+
+	@Override
+	public SatelliteMulti getSingleCover(String satelliteId, String groundStationId, Double minPitch, String start, Integer hours) {
+		SatelliteMulti vo = new SatelliteMulti(satelliteId);
+		
+		int count = 0;
+		double duration = 0.0;
+		boolean inCover = false;
+		
+		// 得到信关站信息
+		GroundStationInfo groundStationInfo = groundStationMapper.getGroundStationById(groundStationId);
+		
+		// 时间格式
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			// 开始时间
+		    Date startDate = format.parse(start);
+		    // 持续小时数, 最多7天
+		 	hours = hours > 24 * 7 ? 24 * 7 : hours;
+		 	// 时间差(秒)
+		 	long seconds = hours * 60 * 60;
+			
+			// 实例化TLE
+			SatelliteTle satelliteTle = orbitMapper.getTle(satelliteId);
+			// 实例化SGP4计算的卫星
+			Satellite satellite = SatelliteFactory.createSatellite(new TLE(satelliteTle.getTle()));
+			// 使用SGP4计算卫星的覆盖范围
+			long timeStamp = startDate.getTime();
+			for (int i = 0; i < seconds; i++) {
+				Date date = new Date(timeStamp + i * 1000L);
+				
+				// 使用给定的地面站进行计算卫星的位置
+				GroundStationPosition groundStationPosition = new GroundStationPosition(groundStationInfo.getGroundStationLng(), groundStationInfo.getGroundStationLat(), 0);
+				SatPos satPos = satellite.getPosition(groundStationPosition, date);
+				// 卫星的星下点位置
+				double lng = satPos.getLongitude() * 180 / Math.PI;
+				double lat = satPos.getLatitude() * 180 / Math.PI;
+				double alt = satPos.getAltitude();
+				// 星下视角
+				//double subAngle = Math.asin( GlobalConstant.EARTH_RADIUS_KM / (alt + GlobalConstant.EARTH_RADIUS_KM) * Math.cos(minPitch * Math.PI / 180.0) );
+				// 地心角
+				double earthAngle = Math.acos( GlobalConstant.EARTH_RADIUS_KM / (alt + GlobalConstant.EARTH_RADIUS_KM) * Math.cos(minPitch * Math.PI / 180.0) ) * 180 / Math.PI - minPitch;
+				// 覆盖面积
+				//double coverArea = 4 * Math.PI * Math.pow(GlobalConstant.EARTH_RADIUS_KM, 2) * Math.sin(earthAngle / 2.0) * Math.sin(earthAngle / 2.0);
+				// 星下点位置与地心角的弧长
+				double radius = GlobalConstant.EARTH_RADIUS_KM * earthAngle * Math.PI / 180.0;
+				// 星下点位置与信关站的距离
+				double distance = GisUtil.getDistanceFromPosition(lng, lat, groundStationInfo.getGroundStationLng(), groundStationInfo.getGroundStationLat());
+				if (distance < radius) {
+					if (!inCover) {
+						count++;
+					}
+					inCover = true;
+					// 过境时间+1
+					duration++;
+				} else {
+					inCover = false;
+				}	
+			}
+			if (!inCover && count > 0) {
+				count++;
+			}
+			
+			vo.setCount(count);
+			vo.setDuration(duration / 60.0);
+			
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+
+		return vo;
+	}
+	
+	@Override
+	public List<SatelliteMulti> listSatelliteSingleCover(List<String> satelliteIdList, String groundStationId, Double minPitch, String start, Integer hours) {
+		List<SatelliteMulti> list = new ArrayList<>();
+		
+		// 计算开始前标识置为false
+		GlobalAccess.linkCoverMultiFinished = false;
+		for (int i = 0; i < satelliteIdList.size(); i++) {
+			String satelliteId = satelliteIdList.get(i);
+			SatelliteMulti vo = getSingleCover(satelliteId, groundStationId, minPitch, start, hours);
+			if (vo.getCount() > 0)
+			    list.add(vo);
+		}
+		// 计算完成后标识置为true
+		GlobalAccess.linkCoverMultiFinished = true;
+		
+		return list;
+	}
+
+	@Override
+	public List<GroundStationMultiCoverVO> listGroundStationMultiCover(String satelliteId, List<String> groundStationIdList, Double minPitch, String start, Integer hours) {
+		List<GroundStationMultiCoverVO> voList = new ArrayList<>();	
+		
+		for (int i = 0; i < groundStationIdList.size(); i++) {
+			String groundStationId = groundStationIdList.get(i);
+			GroundStationInfo info = groundStationMapper.getGroundStationById(groundStationId);
+			SatelliteMulti vo = getSingleCover(satelliteId, groundStationId, minPitch, start, hours);
+		    GroundStationMultiCoverVO coverVO = new GroundStationMultiCoverVO(info.getGroundStationText(), vo);
+		    voList.add(coverVO);
+		}
+		
+		return voList;
+	}
+
+	@Override
+	public List<SatelliteMulti> listMultis() {
+		
+		return orbitMapper.listMultis();
+	}
+
+	@Override
+	public int deleteMulti() {
+		
+		return orbitMapper.deleteMulti();
+	}
+
+	@Override
+	public int insertMulti(SatelliteMulti single) {
+		
+		return orbitMapper.insertMulti(single);
+	}
+
+	@Override
+	public int insertBatchMulti(List<SatelliteMulti> list) {
+		//清空表数据
+		orbitMapper.deleteMulti();
+	    //批量插入数据
+		int count = list.size() / GlobalConstant.BATCH_NUM;
+		for (int i = 0; i < count; i++) {
+			orbitMapper.insertBatchMulti(list.subList(GlobalConstant.BATCH_NUM * i, GlobalConstant.BATCH_NUM * (i + 1)));
+		}
+		orbitMapper.insertBatchMulti(list.subList(GlobalConstant.BATCH_NUM * count, list.size()));
+		
+		return count;
+	}
+
+	@Override
+	public Page listMultisByPage(Integer currentPage, Integer pageSize) {
+		Page page = new Page();
+		// 分页
+		PageHelper.startPage(currentPage, pageSize);
+		List<SatelliteMulti> list = orbitMapper.listMultis();
+		PageInfo<SatelliteMulti> pageInfo = new PageInfo<>(list);
+		
+		page.setCurrentPage(currentPage);
+		page.setPageSize(pageSize);
+		page.setTotalPage(pageInfo.getPages());
+		page.setDataList(list);
+		page.setTotal(pageInfo.getTotal());
+		
+		return page;
+	}
+	
+	@Override
+	public List<SatelliteRegion> listRegions() {
+		
+		return orbitMapper.listRegions();
+	}
+
+	@Override
+	public int deleteRegion() {
+		
+		return orbitMapper.deleteRegion();
+	}
+
+	@Override
+	public int insertRegion(SatelliteRegion region) {
+		
+		return orbitMapper.insertRegion(region);
+	}
+
+	@Override
+	public int insertBatchRegion(List<SatelliteRegion> list) {
+		//清空表数据
+		orbitMapper.deleteRegion();
+	    //批量插入数据
+		int count = list.size() / GlobalConstant.BATCH_NUM;
+		for (int i = 0; i < count; i++) {
+			orbitMapper.insertBatchRegion(list.subList(GlobalConstant.BATCH_NUM * i, GlobalConstant.BATCH_NUM * (i + 1)));
+		}
+		orbitMapper.insertBatchRegion(list.subList(GlobalConstant.BATCH_NUM * count, list.size()));
+		
+		return count;
+	}
+
+	@Override
+	public SatelliteMulti getRegionCover(String satelliteId, double minLng, double maxLng, double minLat, double maxLat, String start, Integer hours) {
+		SatelliteMulti multi = new SatelliteMulti(satelliteId);
+		
+        int count = 0;
+		double duration = 0.0;
+		boolean inCover = false;
+		// 交换值的顺序
+		if (minLng > maxLng) {
+			minLng = minLng + maxLng;
+			maxLng = minLng - maxLng;
+			minLng = minLng - maxLng;
+		}
+		if (minLat > maxLat) {
+			minLat = minLat + maxLat;
+			maxLat = minLat - maxLat;
+			minLat = minLat - maxLat;
+		}
+		
+		// 使用北京的地理坐标作为地面站进行计算卫星的位置
+		GroundStationPosition groundStationPosition = new GroundStationPosition(116, 39, 0);
+		
+		// 时间格式
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			// 开始时间
+		    Date startDate = format.parse(start);
+		    // 持续小时数, 最多7天
+		 	hours = hours > 24 * 7 ? 24 * 7 : hours;
+		 	// 时间差(秒)
+		 	long seconds = hours * 60 * 60;
+			
+			// 实例化TLE
+			SatelliteTle satelliteTle = orbitMapper.getTle(satelliteId);
+			// 实例化SGP4计算的卫星
+			Satellite satellite = SatelliteFactory.createSatellite(new TLE(satelliteTle.getTle()));
+			// 使用SGP4计算卫星的覆盖范围
+			long timeStamp = startDate.getTime();
+			for (int i = 0; i < seconds; i++) {
+				Date date = new Date(timeStamp + i * 1000L);
+				
+				SatPos satPos = satellite.getPosition(groundStationPosition, date);
+				// 卫星的星下点位置
+				double lng = satPos.getLongitude() * 180 / Math.PI;
+				double lat = satPos.getLatitude() * 180 / Math.PI;
+				double radius = satPos.getRangeCircleRadiusKm();
+				
+				// 网格分割，遍历所有的网格点
+				boolean gridCover = false;
+				for (double u = minLng; u < maxLng; u++) {
+					for (double v = minLat ; v < maxLat; v++) {
+						// 星下点位置与网格点的距离
+						double distance = GisUtil.getDistanceFromPosition(lng, lat, u, v);
+						if (distance < radius) {
+							gridCover = true;
+							break;
+						}
+					}
+					if (gridCover)
+						break;
+				}
+				
+				if (gridCover) {
+					if (!inCover) {
+						count++;
+					}
+					inCover = true;
+					// 过境时间+1
+					duration++;
+				} else {
+					inCover = false;
+				}
+			}
+			if (!inCover && count > 0) {
+				count++;
+			}
+			
+			multi.setCount(count);
+			multi.setDuration(duration / 60.0);
+			
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+
+		return multi;
+	}
+	
+	@Override
+	public List<SatelliteRegion> listRegionCover(String satelliteId, double minLng, double maxLng, double minLat, double maxLat, String start, Integer hours) {
+		List<SatelliteRegion> list = new ArrayList<>();
+		
+		// 计算开始前标识置为false
+		GlobalAccess.linkCoverRegionFinished = false;
+		
+		// 交换值的顺序
+		if (minLng > maxLng) {
+			minLng = minLng + maxLng;
+			maxLng = minLng - maxLng;
+			minLng = minLng - maxLng;
+		}
+		if (minLat > maxLat) {
+			minLat = minLat + maxLat;
+			maxLat = minLat - maxLat;
+			minLat = minLat - maxLat;
+		}
+		
+		// 使用北京的地理坐标作为地面站进行计算卫星的位置
+		GroundStationPosition groundStationPosition = new GroundStationPosition(116, 39, 0);
+		
+		// 时间格式
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			// 开始时间
+		    Date startDate = format.parse(start);
+		    // 持续小时数, 最多7天
+		 	hours = hours > 24 * 7 ? 24 * 7 : hours;
+		 	// 时间差(秒)
+		 	long seconds = hours * 60 * 60;
+			
+			// 实例化TLE
+			SatelliteTle satelliteTle = orbitMapper.getTle(satelliteId);
+			// 实例化SGP4计算的卫星
+			Satellite satellite = SatelliteFactory.createSatellite(new TLE(satelliteTle.getTle()));
+			// 使用SGP4计算卫星的覆盖范围
+			long timeStamp = startDate.getTime();
+			for (int i = 0; i < seconds; i++) {
+				Date date = new Date(timeStamp + i * 1000L);
+				
+				SatPos satPos = satellite.getPosition(groundStationPosition, date);
+				// 卫星的星下点位置
+				double lng = satPos.getLongitude() * 180 / Math.PI;
+				double lat = satPos.getLatitude() * 180 / Math.PI;
+				double radius = satPos.getRangeCircleRadiusKm();
+				
+				// 网格分割，遍历所有的网格点
+				double gridCount = 0;
+				boolean gridCover = false;
+				// 纬度以cos作为步长
+				double stepLat = 1;
+				double lngRange = 0;
+				double latRange = 0;
+				for (double u = minLng; u < maxLng; u++) {
+					for (double v = minLat ; v < maxLat; v += stepLat) {
+						// 星下点位置与网格点的距离
+						double distance = GisUtil.getDistanceFromPosition(lng, lat, u, v);
+						if (distance < radius) {
+							gridCount++;
+							gridCover = true;
+						}
+						stepLat = Math.cos(v / 180.0 * Math.PI);
+						latRange++;
+					}
+					lngRange++;
+				}
+				
+				if (gridCover) {
+					// 覆盖面积占比
+					double ratio = gridCount / (lngRange * latRange);
+					SatelliteRegion region = new SatelliteRegion(date, ratio);
+					list.add(region);
+				}
+			}
+			
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
+		// 计算完成后标识置为true
+		GlobalAccess.linkCoverRegionFinished = true;
+
+		return list;
+	}
+	
+	@Override
+	public Page listRegionsByPage(Integer currentPage, Integer pageSize) {
+		Page page = new Page();
+		// 分页
+		PageHelper.startPage(currentPage, pageSize);
+		List<SatelliteRegion> list = orbitMapper.listRegions();
+		PageInfo<SatelliteRegion> pageInfo = new PageInfo<>(list);
+		
+		page.setCurrentPage(currentPage);
+		page.setPageSize(pageSize);
+		page.setTotalPage(pageInfo.getPages());
+		page.setDataList(list);
+		page.setTotal(pageInfo.getTotal());
+		
+		return page;
+	}
+
+	@Override
+	public List<SatelliteWaveBeam> listWaveBeam(String satelliteId, String datetime) {
+		List<SatelliteWaveBeam> list = new ArrayList<>();
+		
+		// 使用北京的地理坐标作为地面站进行计算卫星的位置
+		GroundStationPosition groundStationPosition = new GroundStationPosition(116, 39, 0);
+		
+		// 时间格式
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			// 计算的时间
+		    Date date = format.parse(datetime);
+			
+			// 实例化TLE
+			SatelliteTle satelliteTle = orbitMapper.getTle(satelliteId);
+			// 实例化SGP4计算的卫星
+			Satellite satellite = SatelliteFactory.createSatellite(new TLE(satelliteTle.getTle()));
+			// 使用SGP4计算卫星的覆盖范围
+			SatPos satPos = satellite.getPosition(groundStationPosition, date);
+			// 卫星的星下点
+			double lng = satPos.getLongitude();
+			double lat = satPos.getLatitude();
+			double alt = satPos.getAltitude();
+			// 最大地心角
+			double maxEarthAngle = Math.acos(GlobalConstant.EARTH_RADIUS_KM / (GlobalConstant.EARTH_RADIUS_KM + alt)) / Math.PI * 180;
+			// 星下点位置与地心角的弧长
+			double radius = GlobalConstant.EARTH_RADIUS_KM * maxEarthAngle * Math.PI / 180.0;
+			for (int delta = 0; delta < 360; delta++) {
+				double[] position = GisUtil.getLngLat(lng, lat, radius, delta);
+				double longitude = new BigDecimal(position[0]).setScale(2, RoundingMode.UP).doubleValue();
+				double latitude = new BigDecimal(position[1]).setScale(2, RoundingMode.UP).doubleValue();
+				list.add(new SatelliteWaveBeam(datetime, latitude, longitude));
+			}
+			
+		} catch (ParseException e) {
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+		}
+		
+		return list;
+	}
+
+	@Override
+	public List<SatelliteWaveBeam> listWaveBeam(String satelliteId, String datetime, double viewAngle) {
+        List<SatelliteWaveBeam> list = new ArrayList<>();
+		
+		// 使用北京的地理坐标作为地面站进行计算卫星的位置
+		GroundStationPosition groundStationPosition = new GroundStationPosition(116, 39, 0);
+		
+		// 时间格式
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			// 计算的时间
+		    Date date = format.parse(datetime);
+			
+			// 实例化TLE
+			SatelliteTle satelliteTle = orbitMapper.getTle(satelliteId);
+			// 实例化SGP4计算的卫星
+			Satellite satellite = SatelliteFactory.createSatellite(new TLE(satelliteTle.getTle()));
+			// 使用SGP4计算卫星的覆盖范围
+			SatPos satPos = satellite.getPosition(groundStationPosition, date);
+			// 卫星的星下点
+			double lng = satPos.getLongitude();
+			double lat = satPos.getLatitude();
+			double alt = satPos.getAltitude();
+			
+			// 最大地心角
+			double maxEarthAngle = Math.acos(GlobalConstant.EARTH_RADIUS_KM / (GlobalConstant.EARTH_RADIUS_KM + alt)) / Math.PI * 180;
+			if (viewAngle >= maxEarthAngle)
+				return null;
+			
+			// 地心角
+			double earthAngle = Math.asin((GlobalConstant.EARTH_RADIUS_KM + alt) / GlobalConstant.EARTH_RADIUS_KM * Math.sin(viewAngle / 180.0 * Math.PI)) / Math.PI * 180 - viewAngle;
+			
+			// 星下点位置与地心角的弧长
+			double radius = GlobalConstant.EARTH_RADIUS_KM * earthAngle * Math.PI / 180.0;
+			for (int delta = 0; delta < 360; delta++) {
+				double[] position = GisUtil.getLngLat(lng, lat, radius, delta);
+				double longitude = new BigDecimal(position[0]).setScale(2, RoundingMode.UP).doubleValue();
+				double latitude = new BigDecimal(position[1]).setScale(2, RoundingMode.UP).doubleValue();
+				list.add(new SatelliteWaveBeam(datetime, latitude, longitude));
+			}
+			
+		} catch (ParseException e) {
+			e.printStackTrace();
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+		}
+		
+		return list;
+	}
+
+	@Override
+	public List<SatelliteWaveBeam> listWaveBeam(String satelliteId, String datetime, double viewAngle, double swayAngle) {
+        List<SatelliteWaveBeam> list = new ArrayList<>();
+		
+		// 使用北京的地理坐标作为地面站进行计算卫星的位置
+		GroundStationPosition groundStationPosition = new GroundStationPosition(116, 39, 0);
+		
+		// 时间格式
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			// 计算的时间
+		    Date date = format.parse(datetime);
+			
+			// 实例化TLE
+			SatelliteTle satelliteTle = orbitMapper.getTle(satelliteId);
+			// 实例化SGP4计算的卫星
+			Satellite satellite = SatelliteFactory.createSatellite(new TLE(satelliteTle.getTle()));
+			// 使用SGP4计算卫星的覆盖范围
+			SatPos satPos = satellite.getPosition(groundStationPosition, date);
+			// 卫星的星下点
+			double lng = satPos.getLongitude();
+			double lat = satPos.getLatitude();
+			double alt = satPos.getAltitude();
+			
+			// 最大地心角
+			double maxEarthAngle = Math.acos(GlobalConstant.EARTH_RADIUS_KM / (GlobalConstant.EARTH_RADIUS_KM + alt)) / Math.PI * 180;
+			if (viewAngle / 2.0 + swayAngle >= maxEarthAngle)
+				return null;
+			
+			// 地心角
+			double earthAngle = Math.asin((GlobalConstant.EARTH_RADIUS_KM + alt) / GlobalConstant.EARTH_RADIUS_KM * Math.sin((viewAngle / 2.0 + swayAngle) / 180.0 * Math.PI)) / Math.PI * 180 - (viewAngle / 2.0 + swayAngle);
+			// 星下点位置与地心角的弧长
+			double radius = GlobalConstant.EARTH_RADIUS_KM * earthAngle * Math.PI / 180.0;			
+			for (int delta = 0; delta < 360; delta++) {
+				double[] position = GisUtil.getLngLat(lng, lat, radius, delta);
+				double longitude = new BigDecimal(position[0]).setScale(2, RoundingMode.UP).doubleValue();
+				double latitude = new BigDecimal(position[1]).setScale(2, RoundingMode.UP).doubleValue();
+				list.add(new SatelliteWaveBeam(datetime, latitude, longitude));
+			}
+			
+		} catch (ParseException e) {
+			e.printStackTrace();
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+		}
+		
+		return list;
+	}
+
+	@Override
+	public Page listWaveBeamsByPage(Integer currentPage, Integer pageSize) {
+		Page page = new Page();
+		// 分页
+		PageHelper.startPage(currentPage, pageSize);
+		List<SatelliteWaveBeam> list = orbitMapper.listWaveBeams();
+		PageInfo<SatelliteWaveBeam> pageInfo = new PageInfo<>(list);
+		
+		page.setCurrentPage(currentPage);
+		page.setPageSize(pageSize);
+		page.setTotalPage(pageInfo.getPages());
+		page.setDataList(list);
+		page.setTotal(pageInfo.getTotal());
+		
+		return page;
+	}
+
+	@Override
+	public List<SatelliteWaveBeam> listWaveBeams() {
+		
+		return orbitMapper.listWaveBeams();
+	}
+
+	@Override
+	public int deleteWaveBeam() {
+		
+		return orbitMapper.deleteWaveBeam();
+	}
+
+	@Override
+	public int insertWaveBeam(SatelliteWaveBeam waveBeam) {
+		
+		return orbitMapper.insertWaveBeam(waveBeam);
+	}
+
+	@Override
+	public int insertBatchWaveBeam(List<SatelliteWaveBeam> list) {
+		//清空表数据
+		orbitMapper.deleteWaveBeam();
+	    //批量插入数据
+		int count = list.size() / GlobalConstant.BATCH_NUM;
+		for (int i = 0; i < count; i++) {
+			orbitMapper.insertBatchWaveBeam(list.subList(GlobalConstant.BATCH_NUM * i, GlobalConstant.BATCH_NUM * (i + 1)));
+		}
+		orbitMapper.insertBatchWaveBeam(list.subList(GlobalConstant.BATCH_NUM * count, list.size()));
+		
+		return count;
+	}
+
+	
+
+	
+
+	
+
 	
 
 	

@@ -50,13 +50,16 @@ public class ExchangeServerHandler extends ChannelInboundHandlerAdapter {
 //				ctx.writeAndFlush(Unpooled.copiedBuffer(request));
 //			}
 			
-			GlobalQueue.getExchangeQueue().put(request);
-			//GlobalQueue.getExchangeQueue().poll();
-			
 //			if (request.length > 2) {
 //			    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm:ss.SSS");
 //			    System.out.println("************tcp server recv:" + formatter.format(LocalDateTime.now()) + request.length + ", " + ByteBufUtil.hexDump(request));
-//			}
+//			}	
+			
+			
+			GlobalQueue.getExchangeQueue().put(request);
+			//GlobalQueue.getExchangeQueue().poll();
+			
+			
 		} finally {
 			//buf.release();
      		ReferenceCountUtil.release(msg);

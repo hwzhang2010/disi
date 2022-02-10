@@ -15,7 +15,10 @@ import com.hywx.sirs.global.GlobalConstant;
  * 3.0x0000007E -- 外测测角
  * 4.0x0000f100 -- GNSS
  * 5.0x00000090 -- 遥测
- * 6.0x00000601 -- 远控
+ * 6.0x00000030 -- 故障
+ * 7.0x00000601 -- 远控
+ * 8.0x00000605 -- 站网计划
+ * 9.0x00000606  -- 站网状态
  * 
  * @author zhang.huawei
  *
@@ -39,8 +42,14 @@ public class BidOperationFactory {
         register(GlobalConstant.BID_ANGLE, new ExtAngleBidOperation());
     	// BID, 轨道根数
         register(GlobalConstant.BID_ORBIT_ELEM, new OrbitElemBidOperation());
+        // BID, 故障
+        register(GlobalConstant.BID_FAULT, new FaultBidOperation());
         // BID, 远控指令
         register(GlobalConstant.BID_RC, new RemoteControlBidOperation());
+        // BID, 站网计划
+        register(GlobalConstant.BID_STATIONNET_PLAN, new StationNetPlanBidOperation());
+        // BID, 站网状态
+        register(GlobalConstant.BID_STATIONNET_STATE, new StationNetStateBidOperation());
     }
 	
 	public static AbstractBidOperation getInstance(Long key) {

@@ -20,8 +20,33 @@ public interface TmMapper {
     List<TmRsltFrame> listTmRsltFrames(@Param("tableName") String tableName);
     
     // 查询表是否存在
-    @Select("SELECT count(*) FROM sqlite_master WHERE type='table' AND name = #{tableName}")
-    int existTmRsltTable(@Param("tableName") String tableName);
+    @Select("SELECT count(*) FROM sqlite_master WHERE type='table' AND TBL_NAME = '${tableName}' ")
+    int existTmRsltFrame(@Param("tableName") String tableName);
+    
+    // 删除表语句
+    @Update("DROP TABLE ${tableName}")
+    int dropTmRsltFrame(@Param("tableName") String tableName);
+    
+    // 创建表语句
+    @Update("create table ${tableName}( CODENAME VARCHAR(100)  NOT NULL, " +
+            " NAME VARCHAR(200) NOT NULL, " +
+            " ID INTEGER NOT NULL, " +
+            " SRCTYPE VARCHAR(10), " + 
+            " RSLTTYPE VARCHAR(10), " +
+            " BD VARCHAR(100), " +
+            " BITRANGE VARCHAR(20), " +
+            " BYTEORDER INTEGER, " +
+            " COEFFICIENT CLOB, " +
+            " ALGORITHM VARCHAR(500), " +
+            " RANGE VARCHAR(200), " +
+            " PRECONDITION VARCHAR(200), " +
+            " VALIDFRAMECNT VARCHAR(100), " +
+            " FRAMEID INTEGER NOT NULL, " +
+            " SUBSYSTEMID INTEGER NOT NULL, " +
+            " OBJID INTEGER NOT NULL, " +
+            " PRIMARY KEY ( ID, FRAMEID, OBJID )  )")
+    int createTmRsltFrame(@Param("tableName") String tableName);
+    
     
     // 插入1条遥测参数
  	@Insert("INSERT INTO ${tableName}(CODENAME, NAME, ID, SRCTYPE, RSLTTYPE, BD, BITRANGE, BYTEORDER, COEFFICIENT, ALGORITHM, RANGE, PRECONDITION, VALIDFRAMECNT, FRAMEID, SUBSYSTEMID, OBJID) VALUES(#{codeName}, #{name}, #{id}, #{srcType}, #{rsltType}, #{bd}, #{bitRange}, #{byteOrder}, #{coefficient}, #{algorithm}, #{range}, #{preCondition}, #{validFrameCnt}, #{frameId}, #{subsystemId}, #{objId})")

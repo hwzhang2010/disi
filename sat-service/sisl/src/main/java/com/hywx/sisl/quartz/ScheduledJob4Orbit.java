@@ -4,7 +4,9 @@ import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -22,11 +24,12 @@ import com.hywx.sisl.bo.TlePredictionFactory;
 import com.hywx.sisl.config.MyConfig;
 import com.hywx.sisl.global.GlobalConstant;
 import com.hywx.sisl.global.GlobalQueue;
+import com.hywx.sisl.orbit.tle.prediction.Sgp4;
 import com.hywx.sisl.orbit.tle.prediction.Tle;
 import com.hywx.sisl.redis.RedisFind;
 import com.hywx.sisl.util.ByteUtil;
 import com.hywx.sisl.util.TimeUtil;
-import com.hywx.sisl.vo.SatellitePositionVO;
+
 
 public class ScheduledJob4Orbit implements Job {
 	// 帧头字节长度
@@ -82,7 +85,7 @@ public class ScheduledJob4Orbit implements Job {
 			Satellite satellite = PredictFactory.getSatellite(satelliteId);
 			SatPos satPos = satellite.getPosition(position, current);
 			//System.out.println("***************************\n" + satelliteId + "\n" + satPos);
-
+			
 			// 可见范围内
 			if (satPos.isAboveHorizon()) {
 			    // 把位置信息加入队列，提供给发送队列（用于外测测距测速、外测测角）
@@ -90,26 +93,34 @@ public class ScheduledJob4Orbit implements Job {
 			    ByteBuffer angle = produceFrameAngle(timeStamp, groundStationId, satelliteId, satPos.getAzimuth(), satPos.getElevation());
 			    GlobalQueue.getSendQueue().offer(range);
 			    GlobalQueue.getSendQueue().offer(angle);
-			}
-			
-			
-	        //只把第0个地面站计算更新后的值用于驱动遥测，遥测从redis获取地面站
-	        if (isFirst) {
-//	        	String positionKey = RedisFind.keyBuilder("satellite", "position", satelliteId);
-//		        SatellitePositionVO vo = new SatellitePositionVO(satelliteId, satPos);
-//		        vo.setId(satelliteId);
-//		        redisTemplate.opsForValue().set(positionKey, vo);
-	        	
-	        	// GPS的卫星位置和速度
+			    
+			    // GPS的卫星位置和速度
 				Tle tle = TlePredictionFactory.getTle(satelliteId);
 				double[][] rv = tle.getRV(current);
-				//System.out.println("*************************r:" + rv[0][0] * 1000 + ", " + rv[0][1] * 1000 + ", " + rv[0][2] * 1000);
-				//System.out.println("*************************v:" + rv[1][0] * 1000 + ", " + rv[1][1] * 1000 + ", " + rv[1][2] * 1000);
+				double[][] rvECEF = fromECItoECEF(timeStamp, rv);
 				
 				// 把位置和速度信息加入队列，提供给发送队列(用于遥测GPS数据)
-				ByteBuffer gps = produceFrameGps(timeStamp, groundStationId, satelliteId, rv);
+				ByteBuffer gps = produceFrameGps(timeStamp, groundStationId, satelliteId, rvECEF);
 				GlobalQueue.getSendQueue().offer(gps);
-	        }
+			    
+			}
+			
+			//只把第0个地面站计算更新后的值用于驱动遥测，遥测从redis获取地面站
+//	        if (isFirst) {
+//	        	// GPS的卫星位置和速度
+//				Tle tle = TlePredictionFactory.getTle(satelliteId);
+//				double[][] rv = tle.getRV(current);
+//				double[][] rvECEF = fromECItoECEF(timeStamp, rv);
+//				
+//				//System.out.println("*************************r:" + rv[0][0] * 1000 + ", " + rv[0][1] * 1000 + ", " + rv[0][2] * 1000);
+//				//System.out.println("*************************v:" + rv[1][0] * 1000 + ", " + rv[1][1] * 1000 + ", " + rv[1][2] * 1000);
+//				//System.out.println("********************rvECEF:" + rvECEF[0][0] * 1000 + ", " + rvECEF[0][1] * 1000 + ", " + rvECEF[0][2] * 1000 + ", " + rvECEF[1][0] * 1000 + ", " + rvECEF[1][1] * 1000 + ", " + rvECEF[1][2] * 1000);
+//				
+//				// 把位置和速度信息加入队列，提供给发送队列(用于遥测GPS数据)
+//				ByteBuffer gps = produceFrameGps(timeStamp, groundStationId, satelliteId, rvECEF);
+//				GlobalQueue.getSendQueue().offer(gps);
+//	        }
+			
 	        
 		}
 		
@@ -123,7 +134,8 @@ public class ScheduledJob4Orbit implements Job {
 		// 设备状态1
 		buffer.put(new byte[] {(byte) 0x3E, (byte) 0x3});
 		// 时标1：对应于测距对应的时间
-		long js = TimeUtil.calJS(LocalDateTime.now());
+		LocalDateTime time = LocalDateTime.ofEpochSecond(timeStamp / 1000, 0, ZoneOffset.ofHours(8));
+		long js = TimeUtil.calJS(time);
 		buffer.put(ByteUtil.fromUInt2Bytes(js, myConfig.isNet()));
 		//目标斜距，单位: m
 		buffer.put(ByteUtil.fromUInt2Bytes(new Double(range * 1000).longValue(), myConfig.isNet()));
@@ -144,7 +156,8 @@ public class ScheduledJob4Orbit implements Job {
 		// 设备状态
 		buffer.put((byte) 0x3);
 		//时标：测角信息采样时刻
-		long js = TimeUtil.calJS(LocalDateTime.now());
+		LocalDateTime time = LocalDateTime.ofEpochSecond(timeStamp / 1000, 0, ZoneOffset.ofHours(8));
+		long js = TimeUtil.calJS(time);
 		buffer.put(ByteUtil.fromUInt2Bytes(js, myConfig.isNet()));
 		// 目标方位角
 	    buffer.put(ByteUtil.fromUInt2Bytes(new Double(azimuth / Math.PI * 180 / 360.0 * Math.pow(2, 32)).longValue(), myConfig.isNet()));
@@ -178,7 +191,7 @@ public class ScheduledJob4Orbit implements Job {
 		buffer.put(ByteUtil.fromDouble2Bytes(rv[1][2] * 1000, myConfig.isNet()));
 		// 时间戳
 		buffer.put(ByteUtil.fromLong2Bytes(timeStamp, myConfig.isNet()));
-		
+	
 		return buffer;
 	}
 	
@@ -195,8 +208,9 @@ public class ScheduledJob4Orbit implements Job {
 	 */
 	private byte[] produceFrameHeader(long timeStamp, String groundStationId, String satelliteId, long bid, int len) {
 		// 将timestamp转为LocalDateTime
-		Instant instant = Instant.ofEpochMilli(timeStamp);
-		LocalDateTime time = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+		//Instant instant = Instant.ofEpochMilli(timeStamp);
+		//LocalDateTime time = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+		LocalDateTime time = LocalDateTime.ofEpochSecond(timeStamp / 1000, 0, ZoneOffset.ofHours(8));
 		
 		byte[] data = new byte[GlobalConstant.FRAME_HEADER_LENGTH];
 		ByteBuffer buffer = ByteBuffer.wrap(data);
@@ -232,7 +246,44 @@ public class ScheduledJob4Orbit implements Job {
 	}
 	
 	
-	
+	private double[][] fromECItoECEF(long timeStamp, double[][] rv) {
+		// 本地时间转UTC
+		//long localTimeInMillis = current.getTime();
+        /** long时间转换成Calendar */
+        Calendar calendar= Calendar.getInstance();
+        calendar.setTimeInMillis(timeStamp);
+        /** 取得时间偏移量 */
+        int zoneOffset = calendar.get(java.util.Calendar.ZONE_OFFSET);
+        /** 取得夏令时差 */
+        int dstOffset = calendar.get(java.util.Calendar.DST_OFFSET);
+        /** 从本地时间里扣除这些差量，即可以取得UTC时间*/
+        calendar.add(java.util.Calendar.MILLISECOND, -(zoneOffset + dstOffset));
+        /** 取得的时间就是UTC标准时间 */
+        //Date utcDate=new Date(calendar.getTimeInMillis());
+		
+        // 得到儒略日, 月份从0开始, 24小时制
+		double[] jdut1 = Sgp4.jday(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DATE), calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
+		// 得到恒星时
+		double gstime = Sgp4.gstime(jdut1[0] + jdut1[1]);
+		
+		// ECEF的坐标初值
+		double r[] = new double[3];
+        double v[] = new double[3];
+		
+		// 坐标系转换(位置)
+		r[0] =  Math.cos(gstime) * rv[0][0] + Math.sin(gstime) * rv[0][1];
+		r[1] = -Math.sin(gstime) * rv[0][0] + Math.cos(gstime) * rv[0][1];
+		r[2] =  rv[0][2];
+	    
+	    // 坐标系转换(速度)
+		v[0] =  Math.cos(gstime) * rv[1][0] + Math.sin(gstime) * rv[1][1] + GlobalConstant.WZ * r[1];
+		v[1] = -Math.sin(gstime) * rv[1][0] + Math.cos(gstime) * rv[1][1] - GlobalConstant.WZ * r[0];
+		v[2] =  rv[1][2];
+		
+		double[][] rvECEF = { r, v };
+
+		return rvECEF;
+	}
 	
 	
 	

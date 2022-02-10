@@ -9,6 +9,9 @@ import com.hywx.sirs.bo.StationData;
  * 3.0x00007E00 -- 外测测角
  * 4.0x0000f100 -- GNSS
  * 5.0x00009000 -- 遥测
+ * 6.0x00000030 -- 故障
+ * 7.0x00000601 -- 远控
+ * 8.0x00000605 -- 站网计划
  * 
  * @author zhang.huawei
  *
