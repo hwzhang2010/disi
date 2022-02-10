@@ -1,0 +1,348 @@
+{
+	"planType":6,
+	"planStartTime":"2021-04-01 00:52:01",
+	"planEndTime":"2021-04-02 02:24:36",
+	"satelliteNumbers":10,
+	"satelliteLoadPlanList":[
+		{
+			"satelliteId":"GuoW0101",
+			"operateNumbers":2,
+			"loadPlanItemList":[
+				{
+					"number":"668099120452042337",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"多星协同观测",
+					"operateType":5,
+					"operateTime":"2021-03-31 13:38:23",
+					"latestInTime":"2021-04-01 01:37:23",
+					"stationId":"WULUMUQI",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0101/2021-03-31/second/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0101/2021-03-31/second/injectData2.json"
+				},
+				{
+					"number":"608968190214451842",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"多星协同观测",
+					"operateType":5,
+					"operateTime":"2021-04-01 01:38:23",
+					"latestInTime":"2021-04-01 13:37:23",
+					"stationId":"WULUMUQI",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0101/2021-04-01/first/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0101/2021-04-01/first/injectData2.json"
+				}
+			]
+		},
+		{
+			"satelliteId":"GuoW0102",
+			"operateNumbers":2,
+			"loadPlanItemList":[
+				{
+					"number":"828806615329640030",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"多星协同观测",
+					"operateType":5,
+					"operateTime":"2021-03-31 13:33:11",
+					"latestInTime":"2021-04-01 01:32:11",
+					"stationId":"WULUMUQI",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0102/2021-03-31/second/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0102/2021-03-31/second/injectData2.json"
+				},
+				{
+					"number":"560402799909486673",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"多星协同观测",
+					"operateType":5,
+					"operateTime":"2021-04-01 01:33:11",
+					"latestInTime":"2021-04-01 13:32:11",
+					"stationId":"WULUMUQI",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0102/2021-04-01/first/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0102/2021-04-01/first/injectData2.json"
+				}
+			]
+		},
+		{
+			"satelliteId":"GuoW0103",
+			"operateNumbers":2,
+			"loadPlanItemList":[
+				{
+					"number":"331334241912800697",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"多星协同观测",
+					"operateType":5,
+					"operateTime":"2021-03-31 13:28:05",
+					"latestInTime":"2021-04-01 01:27:05",
+					"stationId":"WULUMUQI",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0103/2021-03-31/second/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0103/2021-03-31/second/injectData2.json"
+				},
+				{
+					"number":"368007860780947251",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"多星协同观测",
+					"operateType":5,
+					"operateTime":"2021-04-01 01:28:05",
+					"latestInTime":"2021-04-01 13:27:05",
+					"stationId":"WULUMUQI",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0103/2021-04-01/first/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0103/2021-04-01/first/injectData2.json"
+				}
+			]
+		},
+		{
+			"satelliteId":"GuoW0104",
+			"operateNumbers":2,
+			"loadPlanItemList":[
+				{
+					"number":"395710078226454775",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"多星协同观测",
+					"operateType":5,
+					"operateTime":"2021-03-31 13:22:57",
+					"latestInTime":"2021-04-01 01:21:57",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0104/2021-03-31/second/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0104/2021-03-31/second/injectData2.json"
+				},
+				{
+					"number":"993232092027971692",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"多星协同观测",
+					"operateType":5,
+					"operateTime":"2021-04-01 01:22:57",
+					"latestInTime":"2021-04-01 13:21:57",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0104/2021-04-01/first/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0104/2021-04-01/first/injectData2.json"
+				}
+			]
+		},
+		{
+			"satelliteId":"GuoW0105",
+			"operateNumbers":2,
+			"loadPlanItemList":[
+				{
+					"number":"141321730087953600",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"多星协同观测",
+					"operateType":5,
+					"operateTime":"2021-03-31 13:17:40",
+					"latestInTime":"2021-04-01 01:16:40",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0105/2021-03-31/second/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0105/2021-03-31/second/injectData2.json"
+				},
+				{
+					"number":"529710606713888883",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"多星协同观测",
+					"operateType":5,
+					"operateTime":"2021-04-01 01:17:40",
+					"latestInTime":"2021-04-01 13:16:40",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0105/2021-04-01/first/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0105/2021-04-01/first/injectData2.json"
+				}
+			]
+		},
+		{
+			"satelliteId":"GuoW0106",
+			"operateNumbers":2,
+			"loadPlanItemList":[
+				{
+					"number":"953888403065219191",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"多星协同观测",
+					"operateType":5,
+					"operateTime":"2021-03-31 13:12:24",
+					"latestInTime":"2021-04-01 01:11:24",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0106/2021-03-31/second/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0106/2021-03-31/second/injectData2.json"
+				},
+				{
+					"number":"939542369483679091",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"多星协同观测",
+					"operateType":5,
+					"operateTime":"2021-04-01 01:12:24",
+					"latestInTime":"2021-04-01 13:11:24",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0106/2021-04-01/first/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0106/2021-04-01/first/injectData2.json"
+				}
+			]
+		},
+		{
+			"satelliteId":"GuoW0107",
+			"operateNumbers":2,
+			"loadPlanItemList":[
+				{
+					"number":"628181541043993990",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"多星协同观测",
+					"operateType":5,
+					"operateTime":"2021-03-31 13:07:06",
+					"latestInTime":"2021-04-01 01:06:06",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0107/2021-03-31/second/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0107/2021-03-31/second/injectData2.json"
+				},
+				{
+					"number":"598446754061393349",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"多星协同观测",
+					"operateType":5,
+					"operateTime":"2021-04-01 01:07:06",
+					"latestInTime":"2021-04-01 13:06:06",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0107/2021-04-01/first/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0107/2021-04-01/first/injectData2.json"
+				}
+			]
+		},
+		{
+			"satelliteId":"GuoW0108",
+			"operateNumbers":2,
+			"loadPlanItemList":[
+				{
+					"number":"533486494400230087",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"多星协同观测",
+					"operateType":5,
+					"operateTime":"2021-03-31 13:01:45",
+					"latestInTime":"2021-04-01 01:00:45",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0108/2021-03-31/second/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0108/2021-03-31/second/injectData2.json"
+				},
+				{
+					"number":"391454424877132759",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"多星协同观测",
+					"operateType":5,
+					"operateTime":"2021-04-01 01:01:45",
+					"latestInTime":"2021-04-01 13:00:45",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0108/2021-04-01/first/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0108/2021-04-01/first/injectData2.json"
+				}
+			]
+		},
+		{
+			"satelliteId":"GuoW0109",
+			"operateNumbers":2,
+			"loadPlanItemList":[
+				{
+					"number":"742070268424776685",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"多星协同观测",
+					"operateType":5,
+					"operateTime":"2021-03-31 12:56:22",
+					"latestInTime":"2021-04-01 00:55:22",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0109/2021-03-31/second/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0109/2021-03-31/second/injectData2.json"
+				},
+				{
+					"number":"301311140721468417",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"多星协同观测",
+					"operateType":5,
+					"operateTime":"2021-04-01 00:56:22",
+					"latestInTime":"2021-04-01 12:55:22",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0109/2021-04-01/first/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0109/2021-04-01/first/injectData2.json"
+				}
+			]
+		},
+		{
+			"satelliteId":"GuoW010A",
+			"operateNumbers":2,
+			"loadPlanItemList":[
+				{
+					"number":"350106608472585340",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"多星协同观测",
+					"operateType":5,
+					"operateTime":"2021-03-31 12:51:01",
+					"latestInTime":"2021-04-01 00:50:01",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW010A/2021-03-31/second/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW010A/2021-03-31/second/injectData2.json"
+				},
+				{
+					"number":"542726861259822789",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"多星协同观测",
+					"operateType":5,
+					"operateTime":"2021-04-01 00:51:01",
+					"latestInTime":"2021-04-01 12:50:01",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW010A/2021-04-01/first/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW010A/2021-04-01/first/injectData2.json"
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,348 @@
+{
+	"planType":5,
+	"planStartTime":"2021-04-01 00:52:01",
+	"planEndTime":"2021-04-02 02:24:36",
+	"satelliteNumbers":10,
+	"satelliteLoadPlanList":[
+		{
+			"satelliteId":"GuoW0101",
+			"operateNumbers":2,
+			"loadPlanItemList":[
+				{
+					"number":"850705857684833540",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"超宽幅成像",
+					"operateType":5,
+					"operateTime":"2021-03-31 13:39:23",
+					"latestInTime":"2021-04-01 01:38:23",
+					"stationId":"WULUMUQI",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0101/2021-03-31/second/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0101/2021-03-31/second/injectData2.json"
+				},
+				{
+					"number":"977154918272667693",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"超宽幅成像",
+					"operateType":5,
+					"operateTime":"2021-04-01 01:39:23",
+					"latestInTime":"2021-04-01 13:38:23",
+					"stationId":"WULUMUQI",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0101/2021-04-01/first/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0101/2021-04-01/first/injectData2.json"
+				}
+			]
+		},
+		{
+			"satelliteId":"GuoW0102",
+			"operateNumbers":2,
+			"loadPlanItemList":[
+				{
+					"number":"677013840293082883",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"超宽幅成像",
+					"operateType":5,
+					"operateTime":"2021-03-31 13:34:11",
+					"latestInTime":"2021-04-01 01:33:11",
+					"stationId":"WULUMUQI",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0102/2021-03-31/second/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0102/2021-03-31/second/injectData2.json"
+				},
+				{
+					"number":"659359433232959305",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"超宽幅成像",
+					"operateType":5,
+					"operateTime":"2021-04-01 01:34:11",
+					"latestInTime":"2021-04-01 13:33:11",
+					"stationId":"WULUMUQI",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0102/2021-04-01/first/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0102/2021-04-01/first/injectData2.json"
+				}
+			]
+		},
+		{
+			"satelliteId":"GuoW0103",
+			"operateNumbers":2,
+			"loadPlanItemList":[
+				{
+					"number":"293944911244736662",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"超宽幅成像",
+					"operateType":5,
+					"operateTime":"2021-03-31 13:29:05",
+					"latestInTime":"2021-04-01 01:28:05",
+					"stationId":"WULUMUQI",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0103/2021-03-31/second/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0103/2021-03-31/second/injectData2.json"
+				},
+				{
+					"number":"970176316042416225",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"超宽幅成像",
+					"operateType":5,
+					"operateTime":"2021-04-01 01:29:05",
+					"latestInTime":"2021-04-01 13:28:05",
+					"stationId":"WULUMUQI",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0103/2021-04-01/first/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0103/2021-04-01/first/injectData2.json"
+				}
+			]
+		},
+		{
+			"satelliteId":"GuoW0104",
+			"operateNumbers":2,
+			"loadPlanItemList":[
+				{
+					"number":"267589945376887938",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"超宽幅成像",
+					"operateType":5,
+					"operateTime":"2021-03-31 13:23:57",
+					"latestInTime":"2021-04-01 01:22:57",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0104/2021-03-31/second/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0104/2021-03-31/second/injectData2.json"
+				},
+				{
+					"number":"643404013580437092",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"超宽幅成像",
+					"operateType":5,
+					"operateTime":"2021-04-01 01:23:57",
+					"latestInTime":"2021-04-01 13:22:57",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0104/2021-04-01/first/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0104/2021-04-01/first/injectData2.json"
+				}
+			]
+		},
+		{
+			"satelliteId":"GuoW0105",
+			"operateNumbers":2,
+			"loadPlanItemList":[
+				{
+					"number":"213074343652890119",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"超宽幅成像",
+					"operateType":5,
+					"operateTime":"2021-03-31 13:18:40",
+					"latestInTime":"2021-04-01 01:17:40",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0105/2021-03-31/second/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0105/2021-03-31/second/injectData2.json"
+				},
+				{
+					"number":"544153707829834270",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"超宽幅成像",
+					"operateType":5,
+					"operateTime":"2021-04-01 01:18:40",
+					"latestInTime":"2021-04-01 13:17:40",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0105/2021-04-01/first/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0105/2021-04-01/first/injectData2.json"
+				}
+			]
+		},
+		{
+			"satelliteId":"GuoW0106",
+			"operateNumbers":2,
+			"loadPlanItemList":[
+				{
+					"number":"377075274759212617",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"超宽幅成像",
+					"operateType":5,
+					"operateTime":"2021-03-31 13:13:24",
+					"latestInTime":"2021-04-01 01:12:24",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0106/2021-03-31/second/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0106/2021-03-31/second/injectData2.json"
+				},
+				{
+					"number":"585820789358756863",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"超宽幅成像",
+					"operateType":5,
+					"operateTime":"2021-04-01 01:13:24",
+					"latestInTime":"2021-04-01 13:12:24",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0106/2021-04-01/first/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0106/2021-04-01/first/injectData2.json"
+				}
+			]
+		},
+		{
+			"satelliteId":"GuoW0107",
+			"operateNumbers":2,
+			"loadPlanItemList":[
+				{
+					"number":"674147692792489671",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"超宽幅成像",
+					"operateType":5,
+					"operateTime":"2021-03-31 13:08:06",
+					"latestInTime":"2021-04-01 01:07:06",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0107/2021-03-31/second/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0107/2021-03-31/second/injectData2.json"
+				},
+				{
+					"number":"861792779208036426",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"超宽幅成像",
+					"operateType":5,
+					"operateTime":"2021-04-01 01:08:06",
+					"latestInTime":"2021-04-01 13:07:06",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0107/2021-04-01/first/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0107/2021-04-01/first/injectData2.json"
+				}
+			]
+		},
+		{
+			"satelliteId":"GuoW0108",
+			"operateNumbers":2,
+			"loadPlanItemList":[
+				{
+					"number":"229135156239090799",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"超宽幅成像",
+					"operateType":5,
+					"operateTime":"2021-03-31 13:02:45",
+					"latestInTime":"2021-04-01 01:01:45",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0108/2021-03-31/second/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0108/2021-03-31/second/injectData2.json"
+				},
+				{
+					"number":"764139282866118900",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"超宽幅成像",
+					"operateType":5,
+					"operateTime":"2021-04-01 01:02:45",
+					"latestInTime":"2021-04-01 13:01:45",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0108/2021-04-01/first/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0108/2021-04-01/first/injectData2.json"
+				}
+			]
+		},
+		{
+			"satelliteId":"GuoW0109",
+			"operateNumbers":2,
+			"loadPlanItemList":[
+				{
+					"number":"232560307890961958",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"超宽幅成像",
+					"operateType":5,
+					"operateTime":"2021-03-31 12:57:22",
+					"latestInTime":"2021-04-01 00:56:22",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0109/2021-03-31/second/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0109/2021-03-31/second/injectData2.json"
+				},
+				{
+					"number":"595407171278207746",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"超宽幅成像",
+					"operateType":5,
+					"operateTime":"2021-04-01 00:57:22",
+					"latestInTime":"2021-04-01 12:56:22",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW0109/2021-04-01/first/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW0109/2021-04-01/first/injectData2.json"
+				}
+			]
+		},
+		{
+			"satelliteId":"GuoW010A",
+			"operateNumbers":2,
+			"loadPlanItemList":[
+				{
+					"number":"974657332723154618",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"超宽幅成像",
+					"operateType":5,
+					"operateTime":"2021-03-31 12:52:01",
+					"latestInTime":"2021-04-01 00:51:01",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW010A/2021-03-31/second/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW010A/2021-03-31/second/injectData2.json"
+				},
+				{
+					"number":"220392576592542739",
+					"missionId":0,
+					"operateId":"injectData",
+					"operateDescription":"超宽幅成像",
+					"operateType":5,
+					"operateTime":"2021-04-01 00:52:01",
+					"latestInTime":"2021-04-01 12:51:01",
+					"stationId":"BEIJING",
+					"constraints":[],
+					"codeLink":"",
+					"dataLocation":"/CMSS/InjectData/GuoW010A/2021-04-01/first/injectData.json",
+					"dataFormatLocation":"/CMSS/InjectData/GuoW010A/2021-04-01/first/injectData2.json"
+				}
+			]
+		}
+	]
+}
